@@ -27,7 +27,7 @@ class EventsFile
     {
         $res = fopen($this->eventsFileName, 'r');
 
-        if (!$res) {
+        if (false !== $res) {
             throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
         }
 
