@@ -8,7 +8,7 @@ namespace ProfIT\Bbb;
  */
 class EventsFile
 {
-    public $eventFragment;
+    protected $eventsFileName;
 
     /**
      * @param string $src - полный путь до events.xml
@@ -36,10 +36,8 @@ class EventsFile
                     $eventFragment [] = $m[0];
                     yield implode('', $eventFragment);
                     $eventFragment  = [];
-                } else {
-                    if (!preg_match('~(<!--.*|<recording.*|<metadata.*)~', $line, $m)) {
-                        $eventFragment [] = $line;
-                    }
+                } elseif (count($eventFragment) > 0) { // если продолжение фрагмента
+                    $eventFragment [] = $line;
                 }
             }
         }
