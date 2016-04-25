@@ -19,26 +19,28 @@ class EventsFile
     }
 
     /**
-     * @param $startFrag - регулярное выражение начала блока фрагмента
-     * @param $endFrag - регулярное выражение конца блока фрагмента
+     * @param $startPattern - регулярное выражение начала блока фрагмента
+     * @param $endPattern - регулярное выражение конца блока фрагмента
      * @return \Generator - генератор фрагментов
      */
-    public function generateFragment($startFrag, $endFrag)
+    public function getFragments($startPattern, $endPattern)
     {
         $res = fopen($this->eventsFileName, 'r');
 
-        if (false !== $res) {
-            $eventFragment = [];
-            while (false !== $line = fgets($res, 10240)) {
-                if (preg_match($startFrag, $line, $m)) {
-                    $eventFragment [] = $m[0];
-                } elseif (preg_match($endFrag, $line, $m)) {
-                    $eventFragment [] = $m[0];
-                    yield implode('', $eventFragment);
-                    $eventFragment  = [];
-                } elseif (count($eventFragment) > 0) { // если продолжение фрагмента
-                    $eventFragment [] = $line;
-                }
+        if (!$res) {
+            throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+        }
+
+        $eventFragment = [];
+        while (false !== $line = fgets($res, 10240)) {
+            if (preg_match($startPattern, $line, $m)) {
+                $eventFragment [] = $m[0];
+            } elseif (preg_match($endPattern, $line, $m)) {
+                $eventFragment [] = $m[0];
+                yield implode('', $eventFragment);
+                $eventFragment  = [];
+            } elseif (count($eventFragment) > 0) { // если продолжение фрагмента
+                $eventFragment [] = $line;
             }
         }
 
