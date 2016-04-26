@@ -47,11 +47,15 @@ class EventsFile
         fclose($res);
     }
 
-    public function extractCursorEvents($newFileName)
+    /**
+     * @param $startPattern - регулярное выражение начала блока фрагмента
+     * @param $endPattern - регулярное выражение конца блока фрагмента
+     * @param $newFileName - файл для записи всех событий, кроме курсорных (CursorMoveEvent)
+     * @param $event - событие по умолчанию 'CursorMoveEvent'
+     * @throws Exception
+     */
+    public function extractFragments($startPattern, $endPattern, $newFileName, $event = 'CursorMoveEvent')
     {
-        $startPattern = '~<event\s+timestamp="(\d+)".+eventname="([A-Za-z]+Event)">~';
-        $endPattern = '~</event>~';
-
         $res = fopen($this->eventsFileName, 'r');
         $newRes = fopen($newFileName, 'w'); // для записи в конец нового файла
 
@@ -59,63 +63,45 @@ class EventsFile
             throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
         }
 
-        $writeFile = false; // Сигнал для записи в файл
-        $captured = false; // Событие event не поймано
-        $buffer = []; // временный массив для хранения значений [timestamp, x, y]
         $eventFragment = [];
+        $buffer = []; // для csv формата
+
         while (false !== $line = fgets($res, 10240)) {
+            if (preg_match($startPattern, $line, $m)) {
+                $eventFragment[] = $m[0] . PHP_EOL;
+            } elseif (preg_match($endPattern, $line, $m)) {
+                $eventFragment[] = $m[0] . PHP_EOL;
 
-            if (preg_match($startPattern, $line, $m)) { // Начало event
-                $captured = $m[2];
-                if (false === $captured) {
-                    throw new \ProfIT\Bbb\Exception ('Unknown event: ' . $line);
-                }
-
-                switch($captured) {
-                    case 'CursorMoveEvent':
-                        $timestamp = $m[1];
-                        $buffer[0] = $timestamp;
-
-                        /* не попадаю в это блок */
-                        if (preg_match('~<xOffset>([\d\.]+)</xOffset>~', $line, $m)) {
-                            $buffer[2] = $m[1];
-                            continue;
-                        }
-                        /* не попадаю в это блок */
-                        if (preg_match('~<yOffset>([\d\.]+)</yOffset>~', $line, $m)) {
-                            $buffer[2] = $m[1];
-                            continue;
-                        }
-                        break;
-                    default:
-                        $eventFragment[] = $line; // для события, отличного от CursorMoveEvent
-                        break;
-                }
-
-            } elseif (preg_match($endPattern, $line, $m)) { // потерялся закрывающийся </event>
-                if (count($eventFragment) > 0) {
-                    $writeFile = true; // можно записывать в файл
-                    $eventFragment[] = $line;
-                } else {
+                // Проверка на курсорное событие
+                if (preg_match('~<event\s+timestamp="(\d+)".+eventname="'. $event .'">~', $eventFragment[0], $m)) {
+                    $buffer[0] = $m[1]; // timestamp
+                    // Если последовательность тегов для X и Y меняется
+                    if (preg_match('~<xOffset>([\d\.]+)</xOffset>~', $eventFragment[1], $m)) {
+                        $buffer[1] = $m[1];
+                    } elseif (preg_match('~<yOffset>([\d\.]+)</yOffset>~', $eventFragment[1], $m)) {
+                        $buffer[2] = $m[1];
+                    }
+                    // Если последовательность тегов для X и Y меняется
+                    if (preg_match('~<yOffset>([\d\.]+)</yOffset>~', $eventFragment[2], $m)) {
+                        $buffer[2] = $m[1];
+                    } elseif (preg_match('~<xOffset>([\d\.]+)</xOffset>~', $eventFragment[2], $m)) {
+                        $buffer[1] = $m[1];
+                    }
                     ksort($buffer);
-                    echo implode(', ', $buffer) . PHP_EOL;
+                    echo implode(',', $buffer) . PHP_EOL; // вывод в формате CSV "timestamp,x,y"
                     $buffer = [];
-                    $captured = false;
-                    continue;
-                }
 
+                    $eventFragment = [];
+                    continue;
+                } else {
+                    fwrite($newRes, implode('', $eventFragment));
+                    $eventFragment = [];
+                }
             } else {
-                $writeFile = true; // запись строк
                 $eventFragment[] = $line;
             }
-
-            /** Запись в файл */
-            if ($writeFile) {
-                fwrite($newRes, implode('', $eventFragment));
-                $eventFragment = [];
-                $writeFile = false;
-            }
         }
+        fwrite($newRes, implode('', $eventFragment)); // закрывающий тег </recording>
 
         fclose($res);
         fclose($newRes);
