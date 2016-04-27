@@ -127,7 +127,7 @@ class WavFile
         }
         $dst = fopen($dstFileName, 'a');
 
-        fread($src, 44);
+        fread($src, self::DATA_OFFSET);
 
         while ($chunk = fread($src, 1024 * 1024)) {
             fwrite($dst, $chunk);
