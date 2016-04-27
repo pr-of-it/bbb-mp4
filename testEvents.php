@@ -10,7 +10,7 @@ try {
     $startPattern = '~<event\s+timestamp="\d+".*eventname="[A-Za-z]+Event">~';
     $endPattern = '~</event>~';
 
-    $generator = $evF->getFragments($startPattern, $endPattern);
+    $generator = $evF->extractFragments($startPattern, $endPattern);
     foreach ($generator as $eventFragment) {
         echo $eventFragment;
     }

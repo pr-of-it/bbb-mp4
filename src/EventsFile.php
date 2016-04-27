@@ -21,29 +21,45 @@ class EventsFile
     /**
      * @param $startPattern - регулярное выражение начала блока фрагмента
      * @param $endPattern - регулярное выражение конца блока фрагмента
+     * @param $dstFileName - путь к файлу для вывода строк, не соответствующих фрагменту
      * @return \Generator - генератор фрагментов
+     * 
+     * @throws \ProfIT\Bbb\Exception
      */
-    public function getFragments($startPattern, $endPattern)
+    public function extractFragments($startPattern, $endPattern, $dstFileName = null)
     {
-        $res = fopen($this->eventsFileName, 'r');
-
-        if (false === $res) {
+        $src = fopen($this->eventsFileName, 'r');
+        if (false === $src) {
             throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+        }
+        
+        if (!empty($dstFileName)) {
+            $dst = fopen($dstFileName, 'w');
         }
 
         $eventFragment = [];
-        while (false !== $line = fgets($res, 10240)) {
+        $capture = false;
+        
+        while (false !== $line = fgets($src, 10240)) {
             if (preg_match($startPattern, $line, $m)) {
                 $eventFragment[] = $m[0];
-            } elseif (preg_match($endPattern, $line, $m)) {
+                $capture = true;
+            } elseif (preg_match($endPattern, $line, $m) && $capture) {
                 $eventFragment[] = $m[0];
                 yield implode(PHP_EOL, $eventFragment);
-                $eventFragment  = [];
-            } elseif (count($eventFragment) > 0) { // если продолжение фрагмента
+                $eventFragment = [];
+                $capture = false;
+            } elseif ($capture) {
                 $eventFragment[] = $line;
+            } elseif (isset($dst)) {
+                fwrite($dst, $line);
             }
         }
 
-        fclose($res);
+        fclose($src);
+        if (isset($dst)) {
+            fclose($dst);
+        }
     }
+
 }

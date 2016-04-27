@@ -4,9 +4,9 @@ BigBlueButton Record Process
 # Команды
 
 ## extractCursorEvents
-    php extractCursorEvents.php --events-file-src=events.xml --events-file-dst=events.new.xml > cursor.events
+    php extractCursorEvents.php --src=events.xml --dst=events.new.xml > cursor.events
 
-Удаляет из файла events.xml события перемещения курсора, создавая новый файл events.xml без них. Курсорные же события
+Считывает курсорные события из файла events.xml. Создает новый файл events.new.xml без них. Курсорные же события
 выводятся в stdout как CSV "timestamp,x,y"
 
 ## generateCursorPng
