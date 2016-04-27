@@ -1,21 +1,38 @@
 <?php
 /**
- * @use php extractCursorEvents.php --events-file-src=events.xml --events-file-dst=events.new.xml > cursor.events
+ * @use php extractCursorEvents.php --src=events.xml --dst=events.new.xml > cursor.events
  */
-
-$options = getopt('', ['events-file-src:', 'events-file-dst:']);
-$src = realpath($options['events-file-src']);
-$newFileName    = $options['events-file-dst'];
-
 require __DIR__ . '/autoload.php';
 
+$options = getopt('', ['src:', 'dst:']);
+$srcFileName = realpath($options['src']);
+$dstFileName = $options['dst'];
+
+$events = new \ProfIT\Bbb\EventsFile($srcFileName);
+
 try {
-    $startPattern = '~<event\s+timestamp="\d+".*eventname="[A-Za-z]+Event">~';
-    $endPattern = '~</event>~';
+    $fragments = $events->extractFragments(
+        '~<event.+eventname="CursorMoveEvent">~',
+        '~</event>~',
+        $dstFileName
+    );
+    
+    foreach ($fragments as $fragment) {
+        $eventParams = [];
 
-    $evCursors = new ProfIT\Bbb\EventsFile($src);
-    $evCursors->extractFragments($startPattern, $endPattern, $newFileName);
+        if (preg_match('~<event\s+timestamp="(\d+)".+>~U', $fragment, $m)) {
+            $eventParams[0] = $m[1];
+        }
+        if (preg_match('~<xOffset>([\d\.]+)</xOffset>~', $fragment, $m)) {
+            $eventParams[1] = $m[1];
+        }
+        if (preg_match('~<yOffset>([\d\.]+)</yOffset>~', $fragment, $m)) {
+            $eventParams[2] = $m[1];
+        }
 
-} catch(\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage();
+        echo implode(',', $eventParams) . PHP_EOL;
+    }
+} catch (\ProfIT\Bbb\Exception $e) {
+    echo $e->getMessage() . PHP_EOL;
 }
+
