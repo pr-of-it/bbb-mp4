@@ -52,7 +52,7 @@ class WavFile
     /**
      * @param string $headers - заголовки в виде ассоциативного массива
      *
-     * @return array - заголовки в сыром виде
+     * @return string - заголовки в сыром виде
      */
     public function packHeaders($headers) {
         $packFormat = implode('', $this->headerFormat);
@@ -60,7 +60,7 @@ class WavFile
     }
 
     /**
-     * @return array - заголовки в сыром виде
+     * @return string - заголовки в сыром виде
      *
      * @throws \ProfIT\Bbb\Exception
      */
