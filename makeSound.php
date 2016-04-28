@@ -41,7 +41,7 @@ while ($csv = fgetcsv($src, 1024)) {
 fclose($src);
 
 if (isset($firstFragmentSource)) {
-    $execString = SOX_PATH . ' -m' . implode('', $fragments) . ' ' . $dstFileName;
+    $execString = SOX_PATH . ' -m' . implode('', $fragments) . ' -b 16 ' . $dstFileName;
     exec($execString);
     echo 'Сборка звука завершена' .PHP_EOL;
 } else {
