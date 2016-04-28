@@ -18,13 +18,13 @@ BigBlueButton Record Process
 ## extractVoiceEvents
     php extractVoiceEvents.php --src=events.xml > voice.events
 
-Считывает голосовые события из файла events.xml и выводит их в stdout как CSV "start/stop,timestamp,filename".
+Считывает голосовые события из файла events.xml и выводит их в stdout как CSV "Start/Stop,timestamp,filename".
 
 ## makeSound
-    php makeSound.php --src=voice.events --dst=sound.wav
+    php makeSound.php --src=voice.events --src-dir=./audio --dst=sound.wav
 
-Создает на базе файла голосовых событий итоговый файл в формате WAV, тип RIFF. 
-Задается файл, куда будет сохранен результат работы команды.
+Создает на базе файла голосовых событий и фрагментов этих событий итоговый файл. Задается файл, куда нужно
+сохранить результат и опционально путь к папке, где расположены фрагменты.
 
 # Окна (они же области экрана)
 ## NotesWindow
