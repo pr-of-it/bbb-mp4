@@ -27,24 +27,23 @@ while ($csv = fgetcsv($src, 1024)) {
 
         if (isset($firstFragmentStart)) {
             $fragmentDelay = ((int)$csv[1] - $firstFragmentStart) / 1000;
-
-            $mergePart = (0 === count($fragments)) ? '' : '- -m ';
-            $fragments[] = SOX_PATH . ' ' . $mergePart . $fragmentSource . ' -p pad ' . $fragmentDelay . ' 0 | ';
+            $delayPart = ' pad ' . $fragmentDelay . ' 0';
         } else {
             $firstFragmentStart = (int)$csv[1];
             $firstFragmentSource = $fragmentSource;
+            $delayPart = '';
         }
+
+        $fragments[] = ' -v 1 "|' . SOX_PATH . ' ' . $fragmentSource . ' -p' . $delayPart . '"';
     }
 }
 
 fclose($src);
 
 if (isset($firstFragmentSource)) {
-    if (count($fragments) > 0) {
-        $execString = implode('', $fragments) . SOX_PATH . ' - -m ' . $firstFragmentSource . ' ' . $dstFileName;
-    } else {
-        $execString = SOX_PATH . ' ' . $firstFragmentSource . ' ' . $dstFileName;
-    }
+    $execString = SOX_PATH . ' -m' . implode('', $fragments) . ' ' . $dstFileName;
+    exec($execString);
+    echo 'Сборка звука завершена' .PHP_EOL;
+} else {
+    echo 'Голосовые фрагменты не найдены' . PHP_EOL;
 }
-
-exec($execString);
