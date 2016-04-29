@@ -30,7 +30,7 @@ class EventsFile
     {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
         
         if (!empty($dstFileName)) {
@@ -63,19 +63,21 @@ class EventsFile
     }
 
     /**
-     * @param string $pattern - шаблон поиска
+     * @param string $eventName - название события для поиска
      * 
      * @return string|bool - отметка времени или false
      *
      * @throws \ProfIT\Bbb\Exception
      */
-    protected function findTimestampByRegexp($pattern) {
+    protected function findFirstTimestamp($eventName = null) {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
 
         while (false !== $line = fgets($src, 10240)) {
+            $eventPart = empty($eventName) ? '' : ' eventname="' . $eventName . '"';
+            $pattern = '~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U';
             if (preg_match($pattern, $line, $m)) {
                 $timestamp = $m[1];
                 fclose($src);
@@ -92,7 +94,7 @@ class EventsFile
      */
     public function getFirstEventTimestamp()
     {
-        return $this->findTimestampByRegexp('~<event\s+timestamp="(\d+)".+>~U');
+        return $this->findFirstTimestamp();
     }
 
     /**
@@ -100,7 +102,7 @@ class EventsFile
      */
     public function getStartRecordingTimestamp()
     {
-        return $this->findTimestampByRegexp('~<event\s+timestamp="(\d+)".+eventname="StartRecordingEvent">~');
+        return $this->findFirstTimestamp('StartRecordingEvent');
     }
 
 }
