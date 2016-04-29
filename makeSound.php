@@ -20,7 +20,7 @@ if (false === $src) {
 $fragments = [];
 
 while ($csv = fgetcsv($src, 1024)) {
-    if ('Start' === $csv[0]) {
+    if ('start' === $csv[0]) {
 
         $fragmentSource = empty($srcDirName) ? $csv[2] : $srcDirName . DS . basename($csv[2]);
 
