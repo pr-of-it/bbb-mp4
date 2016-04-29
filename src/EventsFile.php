@@ -62,4 +62,45 @@ class EventsFile
         }
     }
 
+    /**
+     * @param string $pattern - шаблон поиска
+     * 
+     * @return string|bool - отметка времени или false
+     *
+     * @throws \ProfIT\Bbb\Exception
+     */
+    protected function findTimestampByRegexp($pattern) {
+        $src = fopen($this->eventsFileName, 'r');
+        if (false === $src) {
+            throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+        }
+
+        while (false !== $line = fgets($src, 10240)) {
+            if (preg_match($pattern, $line, $m)) {
+                $timestamp = $m[1];
+                fclose($src);
+                return $timestamp;
+            }
+        }
+
+        fclose($src);
+        return false;
+    }
+    
+    /**
+     * @return string|bool - отметка времени первого события или false
+     */
+    public function getFirstEventTimestamp()
+    {
+        return $this->findTimestampByRegexp('~<event\s+timestamp="(\d+)".+>~U');
+    }
+
+    /**
+     * @return string|bool - отметка времени начала записи или false
+     */
+    public function getStartRecordingTimestamp()
+    {
+        return $this->findTimestampByRegexp('~<event\s+timestamp="(\d+)".+eventname="StartRecordingEvent">~');
+    }
+
 }
