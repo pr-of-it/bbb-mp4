@@ -4,7 +4,6 @@
  */
 require __DIR__ . '/autoload.php';
 
-define('SOX_PATH', 'sox');
 define('DS', DIRECTORY_SEPARATOR);
 
 $options = getopt('', ['src:', 'src-dir:', 'dst:']);
@@ -14,7 +13,7 @@ $dstFileName = realpath(dirname($options['dst'])) . DS . basename($options['dst'
 
 $src = fopen($srcFileName, 'r');
 if (false === $src) {
-    echo 'Ошибка открытия файла: ' . $srcFileName . PHP_EOL;
+    echo 'Error while opening file: ' . $srcFileName . PHP_EOL;
     exit(0);
 }
 
@@ -34,7 +33,7 @@ while ($csv = fgetcsv($src, 1024)) {
             $delayPart = '';
         }
 
-        $fragments[] = ' -v 1 "|' . SOX_PATH . ' ' . $fragmentSource . ' -p' . $delayPart . '"';
+        $fragments[] = ' -v 1 "|sox ' . $fragmentSource . ' -p' . $delayPart . '"';
     }
 }
 
@@ -42,10 +41,10 @@ fclose($src);
 
 if (isset($firstFragmentSource)) {
     $execString =
-        SOX_PATH . ' -m' . implode('', $fragments) . ' -b 16 ' .
+        'sox -m' . implode('', $fragments) . ' -b 16 ' .
         dirname($dstFileName) . DS . $firstFragmentStart . '.' . basename($dstFileName);
     exec($execString);
-    echo 'Сборка звука завершена' .PHP_EOL;
+    echo 'Sound assembly is completed' .PHP_EOL;
 } else {
-    echo 'Голосовые фрагменты не найдены' . PHP_EOL;
+    echo 'Voice fragments not found' . PHP_EOL;
 }

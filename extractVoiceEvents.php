@@ -18,13 +18,11 @@ try {
     foreach ($fragments as $fragment) {
         $eventParams = [];
 
-        if (preg_match('~<event\s+timestamp="(\d+)".+eventname="(\w+)RecordingEvent">~', $fragment, $m)) {
-            $eventParams[0] = $m[2];
-            $eventParams[1] = $m[1];
-        }
-        if (preg_match('~<filename>(.+)</filename>~', $fragment, $m)) {
-            $eventParams[2] = $m[1];
-        }
+        preg_match('~<event\s+timestamp="(\d+)".+eventname="(\w+)RecordingEvent">~', $fragment, $m);
+        $eventParams[0] = lcfirst($m[2]);
+        $eventParams[1] = $m[1];
+        preg_match('~<filename>(.+)</filename>~', $fragment, $m);
+        $eventParams[2] = $m[1];
 
         echo implode(',', $eventParams) . PHP_EOL;
     }
