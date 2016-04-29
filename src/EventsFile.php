@@ -69,14 +69,14 @@ class EventsFile
      *
      * @throws \ProfIT\Bbb\Exception
      */
-    protected function findFirstTimestamp($eventName = null) {
+    public function findFirstTimestamp($eventName = null) {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
             throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
 
         while (false !== $line = fgets($src, 10240)) {
-            $eventPart = empty($eventName) ? '' : ' eventname="' . $eventName . '"';
+            $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
             $pattern = '~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U';
             if (preg_match($pattern, $line, $m)) {
                 $timestamp = $m[1];
@@ -89,20 +89,4 @@ class EventsFile
         return false;
     }
     
-    /**
-     * @return string|bool - отметка времени первого события или false
-     */
-    public function getFirstEventTimestamp()
-    {
-        return $this->findFirstTimestamp();
-    }
-
-    /**
-     * @return string|bool - отметка времени начала записи или false
-     */
-    public function getStartRecordingTimestamp()
-    {
-        return $this->findFirstTimestamp('StartRecordingEvent');
-    }
-
 }
