@@ -65,7 +65,7 @@ class EventsFile
     /**
      * @param string $eventName - название события для поиска
      * 
-     * @return string|bool - отметка времени или false
+     * @return string|null - отметка времени или null
      *
      * @throws \ProfIT\Bbb\Exception
      */
@@ -86,7 +86,7 @@ class EventsFile
         }
 
         fclose($src);
-        return false;
+        return null;
     }
     
 }
