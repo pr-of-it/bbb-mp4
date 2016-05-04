@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfIT\Bbb\style;
+namespace ProfIT\Bbb\Style;
 
 class Rule
 {
@@ -13,11 +13,11 @@ class Rule
         $declaration = trim($declaration);
 
         foreach (explode(';', $declaration) as $row) {
+            if ('' === trim($row)) continue;
             list ($name, $value) = explode(':', $row);
 
             $name = trim($name);
-
-            if (! $name) continue;
+            if (!$name) continue;
 
             $this->properties[$name] = trim($value);
         }

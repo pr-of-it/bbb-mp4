@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfIT\Bbb\layout;
+namespace ProfIT\Bbb\Layout;
 
 /**
  * Class Box

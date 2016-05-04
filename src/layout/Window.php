@@ -1,8 +1,9 @@
 <?php
 
-namespace ProfIT\Bbb\layout;
+namespace ProfIT\Bbb\Layout;
 
-class Window extends Box
+class Window
+    extends Box
 {
     public $name;
     public $title;

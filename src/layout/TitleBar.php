@@ -1,8 +1,9 @@
 <?php
 
-namespace ProfIT\Bbb\layout;
+namespace ProfIT\Bbb\Layout;
 
-class TitleBar extends Box
+class TitleBar
+    extends Box
 {
     const FONT_PATH = __DIR__ . '/../../resources/fonts';
 

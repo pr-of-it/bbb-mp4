@@ -1,10 +1,11 @@
 <?php
 
-namespace ProfIT\Bbb\layout;
+namespace ProfIT\Bbb\Layout;
 
 use ProfIT\Bbb\Layout;
 
-class Image extends Box
+class Image
+    extends Box
 {
     public $x = 0;
     public $y = 0;
@@ -28,6 +29,7 @@ class Image extends Box
     public function generatePng($filename)
     {
         $canvas = imagecreatetruecolor($this->absW, $this->absH);
+        imagefill($canvas, 0, 0, imagecolorallocate($canvas, 255, 255, 255));
         $this->canvas = $canvas;
 
         $this->render($canvas);

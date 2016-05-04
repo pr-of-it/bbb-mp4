@@ -4,12 +4,9 @@ namespace ProfIT\Bbb;
 
 class Layout
 {
-    protected $xml;
+    protected $data;
 
-    public $name;
-    public $windows;
-
-    protected $skippedWindows = ['NotesWindow'];
+    protected $activeWindows = ['PresentationWindow', 'VideoDock', 'ChatWindow', 'UsersWindow'];
 
     /**
      * Layout constructor.
@@ -18,50 +15,39 @@ class Layout
      */
     public function __construct(string $filename, string $name)
     {
-        $this->name = $name;
+        /**
+         * @var \SimpleXMLElement $xml
+         */
         $xml = @simplexml_load_file($filename);
-
         if (false === $xml) {
             throw new \Exception('Layout file can not be loaded: ' . $filename);
         }
 
-        $this->xml = $xml;
-    }
+        $data = @$xml->xpath('//layouts/layout[@name="bbb.layout.name.' . $name . '"]');
 
-    /**
-     * @return \SimpleXMLElement
-     * @throws \Exception
-     */
-    protected function getData()
-    {
-        $name = $this->name;
-        $res = @$this->xml->xpath('//layouts/layout[@name="bbb.layout.name.' . $name . '"]');
-
-        if (false === $res) {
+        if (false === $data) {
             throw new \Exception('Invalid layout');
         }
 
-        return $res[0];
+        $this->data = $data[0];
     }
 
     public function getWindows()
     {
-        $data = $this->getData();
-        $ret = [];
+        $windows = [];
 
-        foreach ($data->window as $window) {
+        foreach ($this->data->window as $window) {
+            /**
+             * @var \SimpleXMLElement $window
+             */
             $name = (string) $window->attributes()->name;
-            /*
-            if (in_array($name, $this->skippedWindows)) {
-                continue;
-            }
-            */
+            if (!in_array($name, $this->activeWindows)) continue;
 
             $attributes = $window->attributes();
 
             if (! $attributes->width || ! $attributes->height) continue;
 
-            $ret[$name] = new layout\Window([
+            $windows[$name] = new Layout\Window([
                 'name'   => $name,
                 'relX'   => (float) $attributes->x,
                 'relY'   => (float) $attributes->y,
@@ -74,11 +60,11 @@ class Layout
             ]);
         }
 
-        return $ret;
+        return $windows;
     }
 
     public function setStyleSheet($filename)
     {
-        $styleSheet = new style\Sheet($filename);
+        $styleSheet = new Style\Sheet($filename);
     }
 }
