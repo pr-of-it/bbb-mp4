@@ -1,10 +1,10 @@
 <?php
 
-namespace ProfIT\Bbb;
+namespace ProfIT\Bbb\Layout;
 
 class TitleBar extends Box
 {
-    const FONT_PATH = __DIR__ . '/../resources/fonts/arial.ttf';
+    const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
 
     /** @var Window $parent */
     public $parent;

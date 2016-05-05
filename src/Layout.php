@@ -2,7 +2,8 @@
 
 namespace ProfIT\Bbb;
 
-use ProfIT\Bbb\StyleSheet;
+use ProfIT\Bbb\Layout\StyleSheet;
+use ProfIT\Bbb\Layout\Window;
 
 class Layout
 {

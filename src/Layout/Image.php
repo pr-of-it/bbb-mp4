@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfIT\Bbb;
+namespace ProfIT\Bbb\Layout;
 
 use ProfIT\Bbb\Layout;
 

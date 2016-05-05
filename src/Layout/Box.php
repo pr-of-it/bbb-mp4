@@ -1,10 +1,10 @@
 <?php
 
-namespace ProfIT\Bbb;
+namespace ProfIT\Bbb\Layout;
 
 /**
  * Class Box
- * @package ProfIT\Bbb
+ * @package ProfIT\Bbb\Layout
  * @property-read int $absX calculated absolute x
  * @property-read int $absY calculated absolute y
  * @property-read int $absW calculated absolute width
