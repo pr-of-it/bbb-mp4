@@ -2,18 +2,26 @@
 
 namespace ProfIT\Bbb;
 
+use ProfIT\Bbb\StyleSheet;
+
 class Layout
 {
     protected $data;
+    protected $styles;
 
-    protected $activeWindows = ['PresentationWindow', 'VideoDock', 'ChatWindow', 'UsersWindow'];
+    protected $activeWindows = [
+        'PresentationWindow' => 'Презентация',
+        'VideoDock'          => 'Веб-камера',
+        'ChatWindow'         => 'Чат',
+        'UsersWindow'        => 'Пользователи',
+    ];
 
     /**
      * Layout constructor.
      * @param string $filename
      * @throws \Exception
      */
-    public function __construct(string $filename, string $name)
+    public function __construct(string $filename, string $name, StyleSheet $styles)
     {
         /**
          * @var \SimpleXMLElement $xml
@@ -30,6 +38,7 @@ class Layout
         }
 
         $this->data = $data[0];
+        $this->styles = $styles;
     }
 
     public function getWindows()
@@ -41,14 +50,14 @@ class Layout
              * @var \SimpleXMLElement $window
              */
             $name = (string) $window->attributes()->name;
-            if (!in_array($name, $this->activeWindows)) continue;
+            if (!in_array($name, array_keys($this->activeWindows))) continue;
 
             $attributes = $window->attributes();
 
             if (! $attributes->width || ! $attributes->height) continue;
 
-            $windows[$name] = new Layout\Window([
-                'name'   => $name,
+            $windows[$name] = new Window($this->styles, [
+                'name'   => $this->activeWindows[$name],
                 'relX'   => (float) $attributes->x,
                 'relY'   => (float) $attributes->y,
                 'relW'   => (float) $attributes->width,
@@ -63,8 +72,4 @@ class Layout
         return $windows;
     }
 
-    public function setStyleSheet($filename)
-    {
-        $styleSheet = new Style\Sheet($filename);
-    }
 }

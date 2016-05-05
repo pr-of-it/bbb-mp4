@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfIT\Bbb\Layout;
+namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout;
 
@@ -9,13 +9,13 @@ class Image
 {
     public $x = 0;
     public $y = 0;
-    public $canvas;
 
     protected $layout;
 
     public function loadLayout(Layout $layout)
     {
         $this->layout = $layout;
+        $this->bgColor = $this->styles->rules['Application']['backgroundColor'];
 
         foreach ($layout->getWindows() as $child) {
             /** @var Window $child */
@@ -29,7 +29,8 @@ class Image
     public function generatePng($filename)
     {
         $canvas = imagecreatetruecolor($this->absW, $this->absH);
-        imagefill($canvas, 0, 0, imagecolorallocate($canvas, 255, 255, 255));
+        imagefill($canvas, 0, 0, self::color($canvas, $this->bgColor));
+
         $this->canvas = $canvas;
 
         $this->render($canvas);
