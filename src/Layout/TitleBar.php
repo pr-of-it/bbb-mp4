@@ -2,7 +2,10 @@
 
 namespace ProfIT\Bbb\Layout;
 
-class TitleBar extends Box
+use ProfIT\Bbb\Layout;
+
+class TitleBar
+    extends Box
 {
     const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
 
@@ -27,7 +30,7 @@ class TitleBar extends Box
     {
         parent::render($canvas);
 
-        $text = $this->parent->title;
+        $text = Layout::WINDOWS[$this->parent->name];
 
         $bbox = imagettfbbox($this->fontSize, 0, self::FONT_PATH, $text);
 
@@ -42,6 +45,6 @@ class TitleBar extends Box
 
         imagettftext($canvas, $this->fontSize, 0, $x, $y, self::color($canvas, $this->color), self::FONT_PATH, $text);
 
-        $this->parent->addOffset(0, $this->absH);
+        $this->parent->addOffset(0, $this->absH + 5);
     }
 }

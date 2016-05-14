@@ -126,7 +126,7 @@ class Box {
     {
         $offset = $this->relX * $parent->absW;
 
-        return round($parent->absX + $offset + $parent->offset[3]);
+        return (int) round($parent->absX + $offset + $parent->offset[3]);
     }
 
     public function getAbsY(Box $parent)

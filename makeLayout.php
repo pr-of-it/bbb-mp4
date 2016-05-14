@@ -1,8 +1,10 @@
 <?php
 /**
- * @use php makeLayout.php --width=1280 --height=720 --dst=test.png
+ * @use php makeLayout.php --width=1280 --height=720 --dst=test.png > contents.coords
  */
 require __DIR__ . '/autoload.php';
+
+define('DS', DIRECTORY_SEPARATOR);
 
 $options = getopt('', ['width:', 'height:', 'dst:']);
 $width = $options['width'] ?? 1280;
@@ -13,5 +15,9 @@ $css = new \ProfIT\Bbb\Layout\StyleSheet(__DIR__ . '/resources/style/css/BBBDefa
 $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
 
 $image = new \ProfIT\Bbb\Layout\Image($css, ['w' => $width, 'h' => $height]);
-$image->loadLayout($layout);
+$contents = $image->loadLayout($layout);
 $image->generatePng($dstFileName);
+
+foreach ($contents as $content) {
+    echo implode(',', $content) . PHP_EOL;
+}

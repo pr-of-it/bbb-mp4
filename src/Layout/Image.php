@@ -17,13 +17,17 @@ class Image
         $this->layout = $layout;
         $this->bgColor = $this->styles->rules['Application']['backgroundColor'];
 
+        $contents = [];
+
         foreach ($layout->getWindows() as $child) {
             /** @var Window $child */
-            $child->title = $child->name;
             $child->createTitleBar();
 
             $this->addChild($child);
+            $contents[] = $child->getContentCoordinates();
         }
+
+        return $contents;
     }
 
     public function generatePng($filename)

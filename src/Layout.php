@@ -10,7 +10,7 @@ class Layout
     protected $data;
     protected $styles;
 
-    protected $activeWindows = [
+    const WINDOWS = [
         'PresentationWindow' => 'Презентация',
         'VideoDock'          => 'Веб-камера',
         'ChatWindow'         => 'Чат',
@@ -51,14 +51,14 @@ class Layout
              * @var \SimpleXMLElement $window
              */
             $name = (string) $window->attributes()->name;
-            if (!in_array($name, array_keys($this->activeWindows))) continue;
+            if (!in_array($name, array_keys(self::WINDOWS))) continue;
 
             $attributes = $window->attributes();
 
             if (! $attributes->width || ! $attributes->height) continue;
 
             $windows[$name] = new Window($this->styles, [
-                'name'   => $this->activeWindows[$name],
+                'name'   => $name,
                 'relX'   => (float) $attributes->x,
                 'relY'   => (float) $attributes->y,
                 'relW'   => (float) $attributes->width,
@@ -66,7 +66,7 @@ class Layout
                 'minW'   => (int)   $attributes->minWidth ?: null,
                 'minH'   => (int)   $attributes->minHeight ?: null,
                 'hidden' => $attributes->hidden == true,
-                'pad'    => 2
+                'pad'    => 5,
             ]);
         }
 
