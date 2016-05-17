@@ -30,7 +30,7 @@ class EventsFile
     {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Ошибка открытия файла: ' . $this->eventsFileName);
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
         
         if (!empty($dstFileName)) {
@@ -62,4 +62,31 @@ class EventsFile
         }
     }
 
+    /**
+     * @param string $eventName - название события для поиска
+     * 
+     * @return string|null - отметка времени или null
+     *
+     * @throws \ProfIT\Bbb\Exception
+     */
+    public function findFirstTimestamp($eventName = null) {
+        $src = fopen($this->eventsFileName, 'r');
+        if (false === $src) {
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
+        }
+
+        while (false !== $line = fgets($src, 10240)) {
+            $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
+            $pattern = '~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U';
+            if (preg_match($pattern, $line, $m)) {
+                $timestamp = $m[1];
+                fclose($src);
+                return $timestamp;
+            }
+        }
+
+        fclose($src);
+        return null;
+    }
+    
 }
