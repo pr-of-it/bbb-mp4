@@ -48,7 +48,7 @@ class Box {
     public $bgColor = self::COLOR_WHITE;
     public $bdColor = self::COLOR_GRAY;
 
-    public function __construct(StyleSheet $styles, array $props = [])
+    public function __construct(StyleSheet $styles = null, array $props = [])
     {
         $this->styles = $styles;
 

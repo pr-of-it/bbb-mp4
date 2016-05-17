@@ -14,10 +14,11 @@ $dstFileName = isset($options['dst']) ? (realpath(dirname($options['dst'])) . DS
 $css = new \ProfIT\Bbb\Layout\StyleSheet(__DIR__ . '/resources/style/css/BBBDefault.css');
 $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
 
-$image = new \ProfIT\Bbb\Layout\Image($css, ['w' => $width, 'h' => $height]);
-$contents = $image->loadLayout($layout);
-$image->generatePng($dstFileName);
+$image = new \ProfIT\Bbb\Layout\Image($width, $height);
+$image->applyCSS($css);
+$image->generateLayout($layout, $dstFileName);
 
-foreach ($contents as $content) {
-    echo implode(',', $content) . PHP_EOL;
+foreach ($image->getWindows() as $window) {
+    /** @var \ProfIT\Bbb\Layout\Window $window */
+    echo implode(',', $window->getContentCoordinates()) . PHP_EOL;
 }
