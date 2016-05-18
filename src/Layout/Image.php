@@ -22,7 +22,7 @@ class Image
         $this->styles = $styles;
     }
 
-    public function generateLayout(Layout $layout, $dstFileName)
+    public function generateLayout(Layout $layout, $dstFileName, bool $fillContent)
     {
         $this->layout = $layout;
         $this->bgColor = $this->styles->rules['Application']['backgroundColor'];
@@ -30,6 +30,9 @@ class Image
         foreach ($layout->getWindows() as $child) {
             /** @var Window $child */
             $child->createTitleBar();
+            if (true === $fillContent) {
+                $child->createContent();
+            }
             $this->addChild($child);
         }
 

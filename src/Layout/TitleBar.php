@@ -32,19 +32,16 @@ class TitleBar
 
         $text = Layout::WINDOWS[$this->parent->name];
 
-        $bbox = imagettfbbox($this->fontSize, 0, self::FONT_PATH, $text);
-
-        $textHeight = $bbox[1] - $bbox[5];
-        $offsetX = 5;
+        $textHeight = $this->fontSize;
         $offsetY = floor(($this->h - $textHeight) / 2);
 
         $c = $this->getCoordinates();
 
-        $x = $c[0][0] + $offsetX;
+        $x = $c[0][0] + $this->pad;
         $y = $c[0][1] + $textHeight + $offsetY;
 
         imagettftext($canvas, $this->fontSize, 0, $x, $y, self::color($canvas, $this->color), self::FONT_PATH, $text);
 
-        $this->parent->addOffset(0, $this->absH + 5);
+        $this->parent->addOffset(0, $this->absH + $this->pad);
     }
 }
