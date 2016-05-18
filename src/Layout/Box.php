@@ -1,10 +1,10 @@
 <?php
 
-namespace ProfIT\Bbb\layout;
+namespace ProfIT\Bbb\Layout;
 
 /**
  * Class Box
- * @package ProfIT\Bbb\layout
+ * @package ProfIT\Bbb\Layout
  * @property-read int $absX calculated absolute x
  * @property-read int $absY calculated absolute y
  * @property-read int $absW calculated absolute width
@@ -15,6 +15,7 @@ class Box {
     const COLOR_BLACK = '000000';
     const COLOR_GRAY  = 'cccccc';
     const COLOR_WHITE = 'ffffff';
+    const DEFAULT_FONT_SIZE = 12;
 
     public $x;
     public $y;
@@ -39,12 +40,18 @@ class Box {
     public $children = [];
     public $hidden;
 
-    public $color = self::COLOR_BLACK;
-    public $bgColor;
-    public $borderColor;
+    protected $styles;
 
-    public function __construct(array $props = [])
+    public $color = self::COLOR_BLACK;
+    public $fontSize = self::DEFAULT_FONT_SIZE;
+
+    public $bgColor = self::COLOR_WHITE;
+    public $bdColor = self::COLOR_GRAY;
+
+    public function __construct(StyleSheet $styles = null, array $props = [])
     {
+        $this->styles = $styles;
+
         foreach ($props as $key => $val) {
             if (null !== $val) {
                 $this->$key = $val;
@@ -76,7 +83,7 @@ class Box {
                 imagefilledrectangle($canvas, $c[0][0], $c[0][1], $c[1][0], $c[1][1], self::color($canvas, $bgColor));
             }
 
-            if ($borderColor = $this->borderColor) {
+            if ($borderColor = $this->bdColor) {
                 imagerectangle($canvas, $c[0][0], $c[0][1], $c[1][0], $c[1][1], self::color($canvas, $borderColor));
             }
         }
@@ -96,6 +103,10 @@ class Box {
 
     public function __get(string $name)
     {
+        if ('styles' === $name) {
+            return $this->styles;
+        }
+
         if (strpos($name, 'abs') === 0) {
             $prop = substr($name, 3);
 
@@ -115,7 +126,7 @@ class Box {
     {
         $offset = $this->relX * $parent->absW;
 
-        return round($parent->absX + $offset + $parent->offset[3]);
+        return (int) round($parent->absX + $offset + $parent->offset[3]);
     }
 
     public function getAbsY(Box $parent)
@@ -176,7 +187,7 @@ class Box {
 
     public static function color($canvas, string $value)
     {
-        list ($r, $g, $b) = array_map('hexdec', str_split($value, 2));
+        list ($r, $g, $b) = array_map('hexdec', str_split(trim($value, "#"), 2));
 
         return imagecolorallocate($canvas, $r, $g, $b);
     }

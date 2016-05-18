@@ -2,66 +2,62 @@
 
 namespace ProfIT\Bbb;
 
+use ProfIT\Bbb\Layout\StyleSheet;
+use ProfIT\Bbb\Layout\Window;
+
 class Layout
 {
-    protected $xml;
+    protected $data;
+    protected $styles;
 
-    public $name;
-    public $windows;
-
-    protected $skippedWindows = ['NotesWindow'];
+    const WINDOWS = [
+        'PresentationWindow' => 'Презентация',
+        'VideoDock'          => 'Веб-камера',
+        'ChatWindow'         => 'Чат',
+        'UsersWindow'        => 'Пользователи',
+    ];
 
     /**
      * Layout constructor.
      * @param string $filename
      * @throws \Exception
      */
-    public function __construct(string $filename, string $name)
+    public function __construct(string $filename, string $name, StyleSheet $styles)
     {
-        $this->name = $name;
+        /**
+         * @var \SimpleXMLElement $xml
+         */
         $xml = @simplexml_load_file($filename);
-
         if (false === $xml) {
             throw new \Exception('Layout file can not be loaded: ' . $filename);
         }
 
-        $this->xml = $xml;
-    }
+        $data = @$xml->xpath('//layouts/layout[@name="bbb.layout.name.' . $name . '"]');
 
-    /**
-     * @return \SimpleXMLElement
-     * @throws \Exception
-     */
-    protected function getData()
-    {
-        $name = $this->name;
-        $res = @$this->xml->xpath('//layouts/layout[@name="bbb.layout.name.' . $name . '"]');
-
-        if (false === $res) {
+        if (false === $data) {
             throw new \Exception('Invalid layout');
         }
 
-        return $res[0];
+        $this->data = $data[0];
+        $this->styles = $styles;
     }
 
     public function getWindows()
     {
-        $data = $this->getData();
-        $ret = [];
+        $windows = [];
 
-        foreach ($data->window as $window) {
+        foreach ($this->data->window as $window) {
+            /**
+             * @var \SimpleXMLElement $window
+             */
             $name = (string) $window->attributes()->name;
-            /*
-            if (in_array($name, $this->skippedWindows)) {
-                continue;
-            }
-            */
+            if (!in_array($name, array_keys(self::WINDOWS))) continue;
 
             $attributes = $window->attributes();
 
             if (! $attributes->width || ! $attributes->height) continue;
 
-            $ret[$name] = new layout\Window([
+            $windows[$name] = new Window($this->styles, [
                 'name'   => $name,
                 'relX'   => (float) $attributes->x,
                 'relY'   => (float) $attributes->y,
@@ -70,15 +66,11 @@ class Layout
                 'minW'   => (int)   $attributes->minWidth ?: null,
                 'minH'   => (int)   $attributes->minHeight ?: null,
                 'hidden' => $attributes->hidden == true,
-                'pad'    => 2
+                'pad'    => 5,
             ]);
         }
 
-        return $ret;
+        return $windows;
     }
 
-    public function setStyleSheet($filename)
-    {
-        $styleSheet = new style\Sheet($filename);
-    }
 }
