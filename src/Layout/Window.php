@@ -22,6 +22,13 @@ class Window
         $this->addChild($titleBar);
     }
 
+    public function createContent()
+    {
+        $content = new Content($this->styles);
+
+        $this->addChild($content);
+    }
+
     public function getContentCoordinates()
     {
         return [
