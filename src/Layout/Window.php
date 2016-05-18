@@ -17,7 +17,7 @@ class Window
 
     public function createTitleBar()
     {
-        $titleBar = new TitleBar($this->styles);
+        $titleBar = new TitleBar($this->styles, ['pad' => $this->pad]);
 
         $this->addChild($titleBar);
     }
