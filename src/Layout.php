@@ -2,6 +2,7 @@
 
 namespace ProfIT\Bbb;
 
+use ProfIT\Bbb\Layout\Box;
 use ProfIT\Bbb\Layout\StyleSheet;
 use ProfIT\Bbb\Layout\Window;
 
@@ -9,9 +10,15 @@ class Layout
 {
     protected $data;
     protected $styles;
-    public $pad;
 
-    const WINDOWS = [
+    protected $width;
+    protected $height;
+    protected $pad;
+
+    protected $windows = [];
+    protected $markedWindows = [];
+
+    const WINDOW_TITLES = [
         'PresentationWindow' => 'Презентация',
         'VideoDock'          => 'Веб-камера',
         'ChatWindow'         => 'Чат',
@@ -19,23 +26,9 @@ class Layout
         'Deskshare'          => 'Трансляция рабочего стола',
     ];
 
-    const DESKSHARE = [
-        'x' => 0.1,
-        'y' => 0.1,
-        'w' => 0.8,
-        'h' => 0.8,
-    ];
-
-    /**
-     * Layout constructor.
-     * @param string $filename
-     * @throws \Exception
-     */
-    public function __construct(string $filename, string $name, StyleSheet $styles, $pad)
+    public function __construct(string $filename, string $name, StyleSheet $styles)
     {
-        /**
-         * @var \SimpleXMLElement $xml
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = @simplexml_load_file($filename);
         if (false === $xml) {
             throw new \Exception('Layout file can not be loaded: ' . $filename);
@@ -47,40 +40,103 @@ class Layout
             throw new \Exception('Invalid layout');
         }
 
-        $this->data = $data[0];
         $this->styles = $styles;
-        $this->pad = $pad;
+        $this->data = $data[0];
     }
 
-    public function getWindows()
+    public function setDimensions(int $width, int $height, int $pad)
+    {
+        $this->width = $width;
+        $this->height = $height;
+        $this->pad = $pad;
+
+        $this->makeWindows();
+    }
+
+    protected function makeWindows()
     {
         $windows = [];
 
         foreach ($this->data->window as $window) {
-            /**
-             * @var \SimpleXMLElement $window
-             */
-            $name = (string) $window->attributes()->name;
-            if (!in_array($name, array_keys(self::WINDOWS))) continue;
-
+            /** @var \SimpleXMLElement $window */
             $attributes = $window->attributes();
+            if (
+                empty($attributes->width)
+                ||
+                false === in_array((string)$attributes->name, array_keys(self::WINDOW_TITLES))
+            ) {
+                continue;
+            }
 
-            if (! $attributes->width || ! $attributes->height) continue;
-
-            $windows[$name] = new Window($this->styles, [
-                'name'   => $name,
-                'relX'   => (float) $attributes->x,
-                'relY'   => (float) $attributes->y,
-                'relW'   => (float) $attributes->width,
-                'relH'   => (float) $attributes->height,
-                'minW'   => (int)   $attributes->minWidth ?: null,
-                'minH'   => (int)   $attributes->minHeight ?: null,
+            $windows[] = new Window($this->styles, [
+                'name'   => (string)$attributes->name,
+                'x'      => (int) round(((float)$attributes->x) * $this->width),
+                'y'      => (int) round(((float)$attributes->y) * $this->height),
+                'w'      => (int) round(((float)$attributes->width) * $this->width),
+                'h'      => (int) round(((float)$attributes->height) * $this->height),
                 'hidden' => $attributes->hidden == true,
                 'pad'    => $this->pad,
             ]);
         }
 
-        return $windows;
+        $this->windows = $windows;
+    }
+
+    public function addCustomWindow(array $params)
+    {
+        $this->windows[] = new Window($this->styles, [
+            'name'   => (string)$params['name'],
+            'x'      => (int) round(((float)$params['x']) * $this->width),
+            'y'      => (int) round(((float)$params['y']) * $this->height),
+            'w'      => (int) round(((float)$params['w']) * $this->width),
+            'h'      => (int) round(((float)$params['h']) * $this->height),
+            'pad'    => $this->pad,
+        ]);
+    }
+
+    public function getWindows()
+    {
+        if (count($this->markedWindows) > 0) {
+            return array_filter($this->windows, function (Window $w) {
+                return in_array($w->name, $this->markedWindows);
+            });
+        } else {
+            return $this->windows;
+        }
+    }
+
+    public function setMarkedWindows(array $marked) {
+        $this->markedWindows = $marked;
+    }
+
+    public function generatePng($dstFileName, bool $fillContent, bool $bgTransparent = false)
+    {
+        $canvas = imagecreatetruecolor($this->width, $this->height);
+
+        if (true === $bgTransparent) {
+            $transparency = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+            imagefill($canvas, 0, 0, $transparency);
+            imagesavealpha($canvas, true);
+        } else {
+            imagefill($canvas, 0, 0, Box::color($canvas, $this->styles->rules['Application']['backgroundColor']));
+        }
+
+        foreach ($this->windows as $window) {
+            /** @var Window $window */
+            if (count($this->markedWindows) > 0 && false === in_array($window->name, $this->markedWindows)) {
+                continue;
+            }
+
+            $window->createTitleBar();
+
+            if (true === $fillContent) {
+                $window->createContent();
+            }
+
+            $window->render($canvas);
+        }
+
+        imagepng($canvas, $dstFileName);
     }
 
 }
