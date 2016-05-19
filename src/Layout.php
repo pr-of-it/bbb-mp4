@@ -9,12 +9,21 @@ class Layout
 {
     protected $data;
     protected $styles;
+    public $pad;
 
     const WINDOWS = [
         'PresentationWindow' => 'Презентация',
         'VideoDock'          => 'Веб-камера',
         'ChatWindow'         => 'Чат',
         'UsersWindow'        => 'Пользователи',
+        'Deskshare'          => 'Трансляция рабочего стола',
+    ];
+
+    const DESKSHARE = [
+        'x' => 0.1,
+        'y' => 0.1,
+        'w' => 0.8,
+        'h' => 0.8,
     ];
 
     /**
@@ -22,7 +31,7 @@ class Layout
      * @param string $filename
      * @throws \Exception
      */
-    public function __construct(string $filename, string $name, StyleSheet $styles)
+    public function __construct(string $filename, string $name, StyleSheet $styles, $pad)
     {
         /**
          * @var \SimpleXMLElement $xml
@@ -40,6 +49,7 @@ class Layout
 
         $this->data = $data[0];
         $this->styles = $styles;
+        $this->pad = $pad;
     }
 
     public function getWindows()
@@ -66,7 +76,7 @@ class Layout
                 'minW'   => (int)   $attributes->minWidth ?: null,
                 'minH'   => (int)   $attributes->minHeight ?: null,
                 'hidden' => $attributes->hidden == true,
-                'pad'    => 5,
+                'pad'    => $this->pad,
             ]);
         }
 
