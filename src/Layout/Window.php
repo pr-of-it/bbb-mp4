@@ -6,6 +6,7 @@ class Window
     extends Box
 {
     public $name;
+    protected $titleBar;
 
     public function __construct(StyleSheet $styles, array $props = [])
     {
@@ -33,6 +34,10 @@ class Window
     {
         return [
             $this->name,
+            $this->absX,
+            $this->absY,
+            $this->absW,
+            $this->absH,
             $this->absX + $this->offset[3],
             $this->absY + $this->offset[0],
             $this->absW - $this->offset[1] - $this->offset[3],

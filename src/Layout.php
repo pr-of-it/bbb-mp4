@@ -16,6 +16,7 @@ class Layout
         'VideoDock'          => 'Веб-камера',
         'ChatWindow'         => 'Чат',
         'UsersWindow'        => 'Пользователи',
+        'Deskshare'          => 'Трансляция рабочего стола',
     ];
 
     /**
