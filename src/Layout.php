@@ -9,7 +9,7 @@ class Layout
 {
     protected $data;
     protected $styles;
-    protected $pad;
+    public $pad;
 
     const WINDOWS = [
         'PresentationWindow' => 'Презентация',
@@ -17,6 +17,13 @@ class Layout
         'ChatWindow'         => 'Чат',
         'UsersWindow'        => 'Пользователи',
         'Deskshare'          => 'Трансляция рабочего стола',
+    ];
+
+    const DESKSHARE = [
+        'x' => 0.1,
+        'y' => 0.1,
+        'w' => 0.8,
+        'h' => 0.8,
     ];
 
     /**

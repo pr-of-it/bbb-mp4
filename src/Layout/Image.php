@@ -80,8 +80,32 @@ class Image
 
     public function getWindows()
     {
+        $layoutParams = [
+            'name' => 'Layout',
+            'x' => 0,
+            'y' => 0,
+            'w' => $this->w,
+            'h' => $this->h,
+        ];
+        $deskshareParams = [
+            'name' => 'Deskshare',
+            'x' => (int) round(Layout::DESKSHARE['x'] * $this->w),
+            'y' => (int) round(Layout::DESKSHARE['y'] * $this->h),
+            'w' => (int) round(Layout::DESKSHARE['w'] * $this->w),
+            'h' => (int) round(Layout::DESKSHARE['h'] * $this->h),
+            'pad' => $this->layout->pad,
+        ];
+
+        $windows = [];
+        $windows[] = $layoutParams;
+
         foreach ($this->children as $child) {
-            yield $child;
+            /** @var \ProfIT\Bbb\Layout\Window $child */
+            $windows[] = $child->getContentCoordinates();
         }
+
+        $windows[] = $deskshareParams;
+
+        return $windows;
     }
 }
