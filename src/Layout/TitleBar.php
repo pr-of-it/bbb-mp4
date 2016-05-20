@@ -24,7 +24,7 @@ class TitleBar
     {
         parent::render($canvas);
 
-        $text = Layout::WINDOW_TITLES[$this->parent->name];
+        $text = Window::TITLES[$this->parent->name] ?? $this->parent->name;
 
         $textHeight = $this->fontSize;
         $offsetY = floor(($this->h - $textHeight) / 2);

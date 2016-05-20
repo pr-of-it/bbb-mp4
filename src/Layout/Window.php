@@ -7,6 +7,14 @@ class Window
 {
     public $name;
 
+    const TITLES = [
+        'PresentationWindow' => 'Презентация',
+        'VideoDock'          => 'Веб-камера',
+        'ChatWindow'         => 'Чат',
+        'UsersWindow'        => 'Пользователи',
+        'Deskshare'          => 'Трансляция рабочего стола',
+    ];
+
     public function __construct(StyleSheet $styles, array $props = [])
     {
         parent::__construct($styles, $props);

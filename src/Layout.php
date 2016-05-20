@@ -18,14 +18,6 @@ class Layout
     protected $windows = [];
     protected $markedWindows = [];
 
-    const WINDOW_TITLES = [
-        'PresentationWindow' => 'Презентация',
-        'VideoDock'          => 'Веб-камера',
-        'ChatWindow'         => 'Чат',
-        'UsersWindow'        => 'Пользователи',
-        'Deskshare'          => 'Трансляция рабочего стола',
-    ];
-
     public function __construct(string $filename, string $name, StyleSheet $styles)
     {
         /** @var \SimpleXMLElement $xml */
@@ -63,7 +55,7 @@ class Layout
             if (
                 empty($attributes->width)
                 ||
-                false === in_array((string)$attributes->name, array_keys(self::WINDOW_TITLES))
+                false === in_array((string)$attributes->name, array_keys(Window::TITLES))
             ) {
                 continue;
             }
@@ -85,7 +77,7 @@ class Layout
     public function addCustomWindow(array $params)
     {
         $this->windows[] = new Window($this->styles, [
-            'name'   => (string)$params['name'],
+            'name'   => $params['name'],
             'x'      => (int) round(((float)$params['x']) * $this->width),
             'y'      => (int) round(((float)$params['y']) * $this->height),
             'w'      => (int) round(((float)$params['w']) * $this->width),
