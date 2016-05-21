@@ -1,20 +1,17 @@
 <?php
 /**
- * @use php extractPresentationSlides.php --src= --size= --save=./
+ * @use php extractPresentationSlides.php --source=./sourceFilePath/*.pdf --size=1080x830 --save=./imageFilePath
  */
 require __DIR__ . '/autoload.php';
 
-$options = getopt('', ['src:', 'size:', 'save:']);
-$srcSource = realpath($options['src']);
-$sizeImage = realpath($options['size']);
-$srcImageSave = realpath($options['save']);
+$options = getopt('', ['source:', 'size:', 'save:']);
+$sourceFilePath = realpath($options['source']);
+$imageSize = realpath($options['size']);
+$imageFilePath = realpath($options['save']);
 
-$src = fopen($srcSource, 'r');
-if (false === $src) {
-    echo 'Error while opening file: ' . $srcFileName . PHP_EOL;
+if (file_exists($sourceFilePath)) {
+    exec('convert -density 300 ' . $sourceFilePath . ' -resize ' . $imageSize . ' ' . $imageFilePath . 'slide.png');
+} else {
+    echo 'File does not exist';
     exit(0);
-}
-
-while (false !== $src) {
-    
 }
