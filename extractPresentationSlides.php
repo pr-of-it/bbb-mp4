@@ -1,17 +1,22 @@
 <?php
 /**
- * @use php extractPresentationSlides.php --source=./source FilePath/*.pdf --size=1080x830 --save=./imageFilePath
+ * @use php extractPresentationSlides.php --source=./sourceFilePath/presentation.pdf --width=1280 --height=720 --save=./imageFilePath
  */
 require __DIR__ . '/autoload.php';
 
-$options = getopt('', ['source:', 'size:', 'save:']);
+$options = getopt('', ['source:', 'width:', 'height:', 'save:']);
 $sourceFilePath = realpath($options['source']);
-$imageSize = $options['size'];
-$imageFilePath = realpath($options['save']);
+$width = $options['width'] ?? 1280;
+$height  = $options['height'] ?? 720;
+$imageFilePath = $options['save'];
 
 if (file_exists($sourceFilePath)) {
-    exec('convert -density 300 ' . $sourceFilePath . ' -resize ' . $imageSize . ' ' . $imageFilePath . '/slide.png');
+
+    if (false !== mkdir(__DIR__ . $imageFilePath)) {
+        $directory = realpath($imageFilePath);
+        exec('convert -density 150 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png');
+    }
+
 } else {
     echo 'File does not exist';
-    exit(0);
 }
