@@ -1,6 +1,6 @@
 <?php
 /**
- * @use php extractPresentationSlides.php --source=./sourceFilePath/*.pdf --size=1080x830 --save=./imageFilePath
+ * @use php extractPresentationSlides.php --source=./source FilePath/*.pdf --size=1080x830 --save=./imageFilePath
  */
 require __DIR__ . '/autoload.php';
 
