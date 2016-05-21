@@ -6,7 +6,7 @@ require __DIR__ . '/autoload.php';
 
 $options = getopt('', ['source:', 'size:', 'save:']);
 $sourceFilePath = realpath($options['source']);
-$imageSize = realpath($options['size']);
+$imageSize = $options['size'];
 $imageFilePath = realpath($options['save']);
 
 if (file_exists($sourceFilePath)) {
