@@ -10,7 +10,7 @@ $imageSize = realpath($options['size']);
 $imageFilePath = realpath($options['save']);
 
 if (file_exists($sourceFilePath)) {
-    exec('convert -density 300 ' . $sourceFilePath . ' -resize ' . $imageSize . ' ' . $imageFilePath . 'slide.png');
+    exec('convert -density 300 ' . $sourceFilePath . ' -resize ' . $imageSize . ' ' . $imageFilePath . '/slide.png');
 } else {
     echo 'File does not exist';
     exit(0);
