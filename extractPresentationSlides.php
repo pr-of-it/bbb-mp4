@@ -3,6 +3,7 @@
  * @use php extractPresentationSlides.php --source=./sourceFilePath/presentation.pdf --width=1280 --height=720 --save=./imageFilePath
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 $options = getopt('', ['source:', 'width:', 'height:', 'save:']);
 $sourceFilePath = realpath($options['source']);
@@ -19,5 +20,5 @@ if (file_exists($sourceFilePath)) {
     exec('convert -density 150 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png');
 
 } else {
-    echo 'File does not exist';
+    halt('File does not exist');
 }
