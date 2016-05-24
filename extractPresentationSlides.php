@@ -11,14 +11,12 @@ $width = $options['width'] ?? 1280;
 $height = $options['height'] ?? 720;
 $imageFilePath = $options['save'];
 
-if (file_exists($sourceFilePath)) {
-
-    if (!file_exists(__DIR__ . $imageFilePath)) {
-        mkdir(__DIR__ . $imageFilePath);
-    }
-    $directory = realpath($imageFilePath);
-    exec('convert -density 150 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png');
-
-} else {
+if (!file_exists($sourceFilePath)) {
     halt('File does not exist');
 }
+
+if (!file_exists(__DIR__ . $imageFilePath)) {
+    mkdir(__DIR__ . $imageFilePath);
+}
+$directory = realpath($imageFilePath);
+exec('convert -density 150 -scene 1 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png');
