@@ -8,7 +8,7 @@ function halt(string $message = '')
 {
     if (null != $message) {
         $message .= "\n";
-        fwrite(STDERR , $message);
+        fwrite(STDERR, $message);
     }
     exit(1);
 }
@@ -18,7 +18,8 @@ function halt(string $message = '')
  *
  * @param string
  */
-function execute(string $command) {
+function execute(string $command)
+{
     $string = escapeshellcmd($command);
     exec($string, $output, $return_var);
 
