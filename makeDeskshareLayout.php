@@ -1,30 +1,33 @@
 <?php
 /**
- * @use php makeDeskshareLayout.php --src=content.coords --dst=deskshare.png
+ * @use php makeDeskshareLayout.php --width=1280 --height=720 --dst=deskshare.png --pad=10 --fill-content-zone > deskshare.coords
  */
+
 require __DIR__ . '/autoload.php';
 
 define('DS', DIRECTORY_SEPARATOR);
 
-$options = getopt('', ['src:', 'dst:']);
-$srcFileName = realpath($options['src']);
+$options = getopt('', ['width:', 'height:', 'dst:', 'pad:', 'fill-content-zone']);
+$width = $options['width'] ?? 1280;
+$height  = $options['height'] ?? 720;
+$pad = $options['pad'] ?? 2;
+$fillContent = isset($options['fill-content-zone']);
 $dstFileName = isset($options['dst']) ? (realpath(dirname($options['dst'])) . DS . basename($options['dst'])) : 'test.png';
 
 $css = new \ProfIT\Bbb\Layout\StyleSheet(__DIR__ . '/resources/style/css/BBBDefault.css');
+$layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
+$layout->setDimensions($width, $height, $pad);
+$layout->addCustomWindow([
+    'name' => 'Deskshare',
+    'x' => 0.1,
+    'y' => 0.1,
+    'w' => 0.8,
+    'h' => 0.8,
+]);
+$layout->setMarkedWindows(['Deskshare']);
+$layout->generatePng($dstFileName, $fillContent, true);
 
-$src = fopen($srcFileName, 'r');
-$layoutParams = [];
-$deskshareParams = [];
-while ($csv = fgetcsv($src, 1024)) {
-    if ('Deskshare' === $csv[0]) {
-        $deskshareParams = $csv;
-    }
-    if ('Layout' === $csv[0]) {
-        $layoutParams = $csv;
-    }
+foreach ($layout->getWindows() as $window) {
+    /** @var \ProfIT\Bbb\Layout\Window $window */
+    echo implode(',', $window->getCoordinates()) . PHP_EOL;
 }
-fclose($src);
-
-$image = new \ProfIT\Bbb\Layout\Image($layoutParams[3], $layoutParams[4]);
-$image->applyCSS($css);
-$image->generateWindowPng($deskshareParams, $dstFileName);
