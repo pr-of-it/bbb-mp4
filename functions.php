@@ -4,7 +4,7 @@
  *
  * @param string
  */
-function halt($message = '')
+function halt(string $message = '')
 {
     if (null != $message) {
         $message .= "\n";
@@ -23,6 +23,6 @@ function execute(string $command) {
     exec($string, $output, $return_var);
 
     if (0 !== $return_var) {
-        halt('Error');
+        halt('Fail executing console command. Exit status #' . $return_var);
     }
 }
