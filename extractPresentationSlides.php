@@ -18,5 +18,7 @@ if (!file_exists($sourceFilePath)) {
 if (!file_exists(__DIR__ . $imageFilePath)) {
     mkdir(__DIR__ . $imageFilePath);
 }
+
 $directory = realpath($imageFilePath);
-exec('convert -density 150 -scene 1 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png');
+$command = 'convert -density 150 -scene 1 ' . $sourceFilePath . ' -resize ' . $width . 'x' . $height . ' ' . $directory . '/slide.png';
+execute($command);
