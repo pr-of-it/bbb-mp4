@@ -20,10 +20,9 @@ function halt($message = null)
  */
 function execute(string $command)
 {
-    $string = escapeshellcmd($command);
-    passthru($string, $return_var);
+    passthru(escapeshellcmd($command), $code);
 
-    if (0 !== $return_var) {
-        halt('Fail executing console command. Exit status #' . $return_var);
+    if (0 !== $code) {
+        halt('Fail executing console command. Exit status #' . $code);
     }
 }
