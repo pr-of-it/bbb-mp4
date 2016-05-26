@@ -4,9 +4,9 @@
  *
  * @param string
  */
-function halt(string $message = '')
+function halt($message = '')
 {
-    if (null != $message) {
+    if (isset($message)) {
         $message .= "\n";
         fwrite(STDERR, $message);
     }
@@ -21,7 +21,7 @@ function halt(string $message = '')
 function execute(string $command)
 {
     $string = escapeshellcmd($command);
-    exec($string, $output, $return_var);
+    passthru($string, $return_var);
 
     if (0 !== $return_var) {
         halt('Fail executing console command. Exit status #' . $return_var);
