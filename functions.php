@@ -6,7 +6,7 @@
  */
 function halt($message = null)
 {
-    if (isset($message)) {
+    if (null !== $message) {
         $message .= "\n";
         fwrite(STDERR, $message);
     }
