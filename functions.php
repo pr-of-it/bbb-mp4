@@ -4,7 +4,7 @@
  *
  * @param string
  */
-function halt($message = '')
+function halt($message = null)
 {
     if (isset($message)) {
         $message .= "\n";
