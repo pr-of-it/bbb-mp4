@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 try {
     $src = __DIR__ . '/caa4040afddd103cde38f50e1ed596b42ef073c8-1458845168792/events.xml';
@@ -15,5 +16,5 @@ try {
         echo $eventFragment;
     }
 } catch(\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage();
+    halt($e->getMessage() . PHP_EOL);
 }

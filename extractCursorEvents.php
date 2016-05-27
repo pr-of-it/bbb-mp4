@@ -3,6 +3,7 @@
  * @use php extractCursorEvents.php --src=events.xml --dst=events.new.xml > cursor.events
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 $options = getopt('', ['src:', 'dst:']);
 $srcFileName = realpath($options['src']);
@@ -33,6 +34,6 @@ try {
         echo implode(',', $eventParams) . PHP_EOL;
     }
 } catch (\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
+    halt($e->getMessage() . PHP_EOL);
 }
 

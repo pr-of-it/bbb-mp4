@@ -11,12 +11,12 @@ $width = $options['width'] ?? 1280;
 $height = $options['height'] ?? 720;
 $imageFilePath = $options['save'];
 
-if (!file_exists($sourceFilePath)) {
-    halt('File does not exist');
+if (!is_readable($sourceFilePath)) {
+    halt('File does not exist or is not readable');
 }
 
 if (!file_exists(__DIR__ . $imageFilePath)) {
-    mkdir(__DIR__ . $imageFilePath);
+    mkdir($imageFilePath);
 }
 
 $directory = realpath($imageFilePath);

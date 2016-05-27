@@ -3,6 +3,7 @@
  * @use php extractVoiceEvents.php --src=events.xml > voice.events
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 $options = getopt('', ['src:']);
 $srcFileName = realpath($options['src']);
@@ -27,5 +28,5 @@ try {
         echo implode(',', $eventParams) . PHP_EOL;
     }
 } catch (\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
+    halt($e->getMessage() . PHP_EOL);
 }
