@@ -15,5 +15,5 @@ try {
         echo $eventFragment;
     }
 } catch(\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage();
+    halt($e->getMessage() . PHP_EOL);
 }
