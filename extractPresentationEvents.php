@@ -12,7 +12,7 @@ $srcFileName = realpath($options['src']);
 $dstFileName = $options['dst'];
 
 if (!is_readable($presentationFilePath)) {
-    halt('Directory does not exist');
+    halt('Directory does not exist or is not readable');
 }
 
 $events = new \ProfIT\Bbb\EventsFile($srcFileName);
