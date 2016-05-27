@@ -30,7 +30,7 @@ try {
             $eventParams[0] = $m[1];
         }
         if (preg_match('~<id>(.+)/(\d+)</id>~', $fragment, $m)) {
-            $eventParams[1] = $presentationFilePath . '\\' . $m[1] . '\\' . $pdfFileName;
+            $eventParams[1] = $presentationFilePath . '/' . $m[1] . '/' . $pdfFileName;
             $eventParams[2] = $m[2];
         }
 
