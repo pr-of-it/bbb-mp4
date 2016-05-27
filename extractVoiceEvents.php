@@ -3,6 +3,7 @@
  * @use php extractVoiceEvents.php --src=events.xml > voice.events
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 $options = getopt('', ['src:']);
 $srcFileName = realpath($options['src']);
