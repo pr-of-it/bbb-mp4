@@ -13,8 +13,7 @@ $dstFileName = realpath(dirname($options['dst'])) . DS . basename($options['dst'
 
 $src = fopen($srcFileName, 'r');
 if (false === $src) {
-    echo 'Error while opening file: ' . $srcFileName . PHP_EOL;
-    exit(0);
+    halt('Error while opening file: ' . $srcFileName . PHP_EOL);
 }
 
 $fragments = [];
@@ -46,5 +45,5 @@ if (isset($firstFragmentSource)) {
     exec($execString);
     echo 'Sound assembly is completed' .PHP_EOL;
 } else {
-    echo 'Voice fragments not found' . PHP_EOL;
+    halt('Voice fragments not found' . PHP_EOL);
 }
