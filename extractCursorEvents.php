@@ -3,6 +3,7 @@
  * @use php extractCursorEvents.php --src=events.xml --dst=events.new.xml > cursor.events
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 $options = getopt('', ['src:', 'dst:']);
 $srcFileName = realpath($options['src']);
