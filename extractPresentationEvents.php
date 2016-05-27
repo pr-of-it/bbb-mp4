@@ -11,7 +11,7 @@ $pdfFileName = $options['pdf'];
 $srcFileName = realpath($options['src']);
 $dstFileName = $options['dst'];
 
-if (!file_exists($presentationFilePath)) {
+if (!is_readable($presentationFilePath)) {
     halt('Directory does not exist');
 }
 
@@ -37,5 +37,5 @@ try {
         echo implode(',', $eventParams) . PHP_EOL;
     }
 } catch (\ProfIT\Bbb\Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
+    halt($e->getMessage() . PHP_EOL);
 };
