@@ -3,6 +3,7 @@
  * @use php makeSound.php --src=voice.events --src-dir=./resources/audio --dst=sound.wav
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
 define('DS', DIRECTORY_SEPARATOR);
 
