@@ -1,12 +1,19 @@
 <?php
 /**
- * @use php extractPresentationEvents.php --src=events.xml --dst=events.new.xml > presentation.events
+ * @use php extractPresentationEvents.php --path=./presentationFilePath/ --pdf=presentation.pdf --src=events.xml --dst=events.new.xml > presentation.events
  */
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/functions.php';
 
-$options = getopt('', ['src:', 'dst:']);
+$options = getopt('', ['path:', 'pdf:', 'src:', 'dst:']);
+$presentationFilePath = realpath($options['path']);
+$pdfFileName = $options['pdf'];
 $srcFileName = realpath($options['src']);
 $dstFileName = $options['dst'];
+
+if (!file_exists($presentationFilePath)) {
+    halt('Directory does not exist');
+}
 
 $events = new \ProfIT\Bbb\EventsFile($srcFileName);
 
@@ -23,7 +30,7 @@ try {
             $eventParams[0] = $m[1];
         }
         if (preg_match('~<id>(.+)/(\d+)</id>~', $fragment, $m)) {
-            $eventParams[1] = $m[1];
+            $eventParams[1] = $presentationFilePath . '\\' . $m[1] . '\\' . $pdfFileName;
             $eventParams[2] = $m[2];
         }
 
