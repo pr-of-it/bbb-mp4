@@ -16,7 +16,7 @@ if (!is_readable($sourceFilePath)) {
 }
 
 if (!file_exists(__DIR__ . $imageFilePath)) {
-    mkdir(__DIR__ . $imageFilePath);
+    mkdir($imageFilePath);
 }
 
 $directory = realpath($imageFilePath);
