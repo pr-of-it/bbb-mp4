@@ -8,19 +8,24 @@ function halt($message = null)
 {
     if (null !== $message) {
         $message .= "\n";
+        var_dump($message);
         fwrite(STDERR, $message);
     }
     exit(1);
 }
 
 /*
- * Execute the console command and check the result of its execution
+ * Executes the console command and checks the result of its execution
  *
  * @param string
  */
-function execute(string $command)
+function execute(string $command, $output = null)
 {
-    passthru(escapeshellcmd($command), $code);
+    if (null !== $output) {
+        $output = ' > ' . $output;
+    }
+
+    passthru(escapeshellcmd($command) . $output, $code);
 
     if (0 !== $code) {
         halt('Fail executing console command. Exit status #' . $code);
