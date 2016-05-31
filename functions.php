@@ -21,11 +21,13 @@ function halt($message = null)
  */
 function execute(string $command, $output = null)
 {
-    if (null !== $output) {
-        $output = ' > ' . $output;
-    }
+    $command = escapeshellcmd($command);
 
-    passthru(escapeshellcmd($command) . $output, $code);
+    if (null !== $output) {
+        $command .= ' > ' . $output;
+    }
+    
+    passthru($command, $code);
 
     if (0 !== $code) {
         halt('Fail executing console command. Exit status #' . $code);
