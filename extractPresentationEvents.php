@@ -1,13 +1,14 @@
 <?php
 /**
- * @use php extractPresentationEvents.php --path=./presentationFilePath/ --pdf=presentation.pdf --src=events.xml --dst=events.new.xml > presentation.events
+ * @use php extractPresentationEvents.php --path=./presentationFilePath/ --src=events.xml --dst=events.new.xml > presentation.events
  */
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
+define('DS', DIRECTORY_SEPARATOR);
+
 $options = getopt('', ['path:', 'pdf:', 'src:', 'dst:']);
 $presentationFilePath = realpath($options['path']);
-$pdfFileName = $options['pdf'];
 $srcFileName = realpath($options['src']);
 $dstFileName = $options['dst'];
 
@@ -30,7 +31,7 @@ try {
             $eventParams[0] = $m[1];
         }
         if (preg_match('~<id>(.+)/(\d+)</id>~', $fragment, $m)) {
-            $eventParams[1] = $presentationFilePath . '/' . $m[1] . '/' . $pdfFileName;
+            $eventParams[1] = $presentationFilePath . DS . $m[1] . DS . $m[1] . '.pdf';
             $eventParams[2] = $m[2];
         }
 

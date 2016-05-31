@@ -41,7 +41,7 @@ fclose($src);
 
 if (isset($firstFragmentSource)) {
     $execString =
-        'sox -m' . implode('', $fragments) . ' -b 16 ' .
+        'sox -m' . implode('', $fragments) . ' -b 16 -r 44100 ' .
         dirname($dstFileName) . DS . $firstFragmentStart . '.' . basename($dstFileName);
     exec($execString);
     echo 'Sound assembly is completed' .PHP_EOL;
