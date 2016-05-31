@@ -2,7 +2,7 @@
 /*
  * Output an error to stderr
  *
- * @param string
+ * @param string $message
  */
 function halt($message = null)
 {
@@ -17,7 +17,8 @@ function halt($message = null)
 /*
  * Executes the console command and checks the result of its execution
  *
- * @param string
+ * @param string $command
+ * @param string $output
  */
 function execute(string $command, $output = null)
 {
