@@ -51,8 +51,7 @@ if (empty($soundStart)) {
 
 /** Combine layout with sound */
 echo '...combining layout with sound' . PHP_EOL;
-//execute('ffmpeg -loglevel quiet -stats -y -loop 1 -i ' . $dstPath . 'layout.png -t 1 ' . $dstPath . 'layout.flv');
-execute('ffmpeg -loglevel quiet -stats -y -loop 1 -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
+execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
     $dstPath . 'layout.png -c:v flv -c:a copy -shortest ' . $dstPath . 'video.flv');
 
 /** Prepare presentation events */
@@ -97,10 +96,12 @@ foreach ($presentations as $key => $p) {
         ' overlay=241:40:enable=\'between(t,' . $offset . ',7200)\' [out]';
 }
 
-exec('ffmpeg -stats -y -i ' . $dstPath . 'video.flv ' .
+exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.flv ' .
     implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
     '" -map "[out]" -map a:0 -c:v flv -c:a copy ' . $dstPath . 'video_presentation.flv');
 
-
 $workTime = time() - $startTime;
-echo 'Total working time: ' . $workTime . ' seconds' . PHP_EOL;
+$hours = floor($workTime / 3600);
+$minutes = floor(($workTime % 3600) / 60);
+$seconds = $workTime % 60;
+echo 'Total working time: ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ' . PHP_EOL;
