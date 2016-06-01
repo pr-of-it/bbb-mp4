@@ -20,7 +20,7 @@ function halt($message = null)
  * @param string $command
  * @param string $output
  */
-function execute(string $command, $output = null)
+function execute(string $command, string $output = null)
 {
     $command = escapeshellcmd($command);
 
@@ -35,27 +35,33 @@ function execute(string $command, $output = null)
     }
 }
 
-function extractCsv($dataPathFile, array $fieldNames = null)
+/*
+ * Extracts data from a CSV-file and returns an array of CSV data elements
+ *
+ * @param string $src
+ * @param array $fieldNames
+ *
+ * @return array
+ */
+function extractCSV(string $src, array $fieldNames = null)
 {
-    $file = fopen($dataPathFile, 'r');
+    $file = fopen($src, 'r');
 
     if (false === $file) {
-        halt('Unable to open file for reading');
+        halt('Unable to open a file for reading while trying to extract CSV');
     }
 
     $data = [];
-    $mass = [];
     while ($csv = fgetcsv($file, 1024)) {
 
         if (null === $fieldNames) {
             $data[] = $csv;
-        }
-
-        if (null !== $fieldNames) {
+        } else {
+            $row = [];
             foreach ($fieldNames as $key => $value) {
-                $mass[$value] = $csv[$key];
+                $row[$value] = $csv[$key];
             }
-            $data[] = $mass;
+            $data[] = $row;
         }
     }
 
