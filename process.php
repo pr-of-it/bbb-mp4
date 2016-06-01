@@ -51,9 +51,9 @@ if (empty($soundStart)) {
 
 /** Combine layout with sound */
 echo '...combining layout with sound' . PHP_EOL;
-execute('ffmpeg -loglevel quiet -stats -y -loop 1 -i ' . $dstPath . 'layout.png -t 1 ' . $dstPath . 'layout.flv');
-execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'layout.flv -i ' .
-    $dstPath . $soundStart . '.sound.wav ' . $dstPath . 'video.flv');
+//execute('ffmpeg -loglevel quiet -stats -y -loop 1 -i ' . $dstPath . 'layout.png -t 1 ' . $dstPath . 'layout.flv');
+execute('ffmpeg -loglevel quiet -stats -y -loop 1 -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
+    $dstPath . 'layout.png -c:v flv -c:a copy -shortest ' . $dstPath . 'video.flv');
 
 /** Prepare presentation events */
 echo '...preparing presentation events' . PHP_EOL;
@@ -92,13 +92,14 @@ $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
     $offset = ($p['time'] - $presentations[0]['time']) / 1000;
-    $sources[] = '-itsoffset ' . $offset . ' -i ' . $slide;
-    $filters[] = (0 === $key ? '[0][1]' : ('[v' . $key . '][' . ($key + 1) . ']')) . ' overlay=236:35' . (count($presentations) === ($key + 1) ? '' : ('[v' . ($key + 1) . ']'));
+    $sources[] = '-i ' . $slide;
+    $filters[] = (0 === $key ? '[0:v]' : '[out]') . '[' . ($key + 1) . ':v]' .
+        ' overlay=241:40:enable=\'between(t,' . $offset . ',7200)\' [out]';
 }
 
 exec('ffmpeg -stats -y -i ' . $dstPath . 'video.flv ' .
     implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
-    '" ' . $dstPath . 'video_presentation.flv');
+    '" -map "[out]" -map a:0 -c:v flv -c:a copy ' . $dstPath . 'video_presentation.flv');
 
 
 $workTime = time() - $startTime;
