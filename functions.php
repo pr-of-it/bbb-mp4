@@ -48,7 +48,7 @@ function extractCSV(string $src, array $fieldNames = null)
     $file = fopen($src, 'r');
 
     if (false === $file) {
-        halt('Unable to open a file for reading while trying to extract CSV');
+        halt('Unable to open a file with CSV data for reading');
     }
 
     $data = [];
