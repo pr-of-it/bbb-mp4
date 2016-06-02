@@ -64,7 +64,7 @@ function extractCSV(string $src, array $fieldNames = null)
             $data[] = $row;
         }
     }
-
+    
     fclose($file);
     return $data;
 }
