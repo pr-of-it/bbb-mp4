@@ -52,7 +52,8 @@ if (empty($soundStart)) {
 /** Combine layout with sound */
 echo '...combining layout with sound' . PHP_EOL;
 execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
-    $dstPath . 'layout.png -c:v flv -c:a copy -shortest ' . $dstPath . 'video.flv');
+    $dstPath . 'layout.png -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy -shortest ' .
+    $dstPath . 'video.avi');
 
 /** Prepare presentation events */
 echo '...preparing presentation events' . PHP_EOL;
@@ -89,9 +90,10 @@ foreach ($presentations as $key => $p) {
         ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' . $offset . ',7200)\' [out]';
 }
 
-execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.flv ' .
+exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.avi ' .
     implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
-    '" -map "[out]" -map a:0 -c:v flv -c:a copy ' . $dstPath . 'video_presentation.flv');
+    '" -map "[out]" -map a:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
+    $dstPath . 'video_presentation.avi');
 
 $workTime = time() - $startTime;
 $hours = floor($workTime / 3600);
