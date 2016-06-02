@@ -15,7 +15,7 @@ if (!is_readable($sourceFilePath)) {
     halt('File does not exist or is not readable');
 }
 
-if (!file_exists(__DIR__ . $imageFilePath)) {
+if (!file_exists($imageFilePath)) {
     mkdir($imageFilePath);
 }
 
