@@ -45,11 +45,11 @@ function execute(string $command, string $output = null)
  */
 function extractCSV(string $src, array $fieldNames = null)
 {
-    $file = fopen($src, 'r');
-
-    if (false === $file) {
-        halt('Unable to open a file with CSV data for reading');
+    if (!is_readable($src)) {
+        halt('File with CSV data does not exist or is not readable');
     }
+
+    $file = fopen($src, 'r');
 
     $data = [];
     while ($csv = fgetcsv($file, 1024)) {
