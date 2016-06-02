@@ -25,13 +25,13 @@ $dstPath = realpath($dstPath) . DS;
 
 /** Prepare layout and content coordinates */
 echo '...preparing layout' . PHP_EOL;
-exec('php makeLayout.php --width=' . $width . ' --height=' . $height .
-    ' --dst=' . $dstPath . 'layout.png --pad=10 --fill-content-zone > ' .
+execute('php makeLayout.php --width=' . $width . ' --height=' . $height .
+    ' --dst=' . $dstPath . 'layout.png --pad=10 --fill-content-zone',
     $dstPath . 'content.coords');
 
 /** Prepare voice events */
 echo '...preparing voice events' . PHP_EOL;
-exec('php extractVoiceEvents.php --src=' . $srcPath . 'events.xml > ' .
+execute('php extractVoiceEvents.php --src=' . $srcPath . 'events.xml',
     $dstPath . 'voice.events');
 
 /** Prepare sound */
@@ -46,7 +46,7 @@ foreach(scandir($dstPath) as $file) {
     }
 }
 if (empty($soundStart)) {
-    halt('Sound preparation fault');
+    halt('Sound preparation fault. Sound file not found.');
 }
 
 /** Combine layout with sound */
@@ -56,31 +56,24 @@ execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.soun
 
 /** Prepare presentation events */
 echo '...preparing presentation events' . PHP_EOL;
-exec('php extractPresentationEvents.php --path=' . $srcPath . 'presentation ' .
-    '--src=' . $srcPath . 'events.xml --dst=' . $dstPath . 'events.wp.xml > ' .
+execute('php extractPresentationEvents.php --path=' . $srcPath . 'presentation ' .
+    '--src=' . $srcPath . 'events.xml --dst=' . $dstPath . 'events.wp.xml',
     $dstPath . 'presentation.events');
 
 /** Prepare presentation slides */
 echo '...preparing presentation slides' . PHP_EOL;
-$presentationSrc = fopen($dstPath . 'presentation.events', 'r');
-if (false === $presentationSrc) {
-    halt('Presentation preparation fault');
-}
-$presentations = [];
-while ($csv = fgetcsv($presentationSrc, 1024)) {
-    $presentations[] = [
-        'time' => $csv[0],
-        'file' => $csv[1],
-        'slide' => $csv[2],
-    ];
-}
-fclose($presentationSrc);
+$presentations = extractCSV($dstPath . 'presentation.events', ['time', 'file', 'slide']);
 $presentationFiles = array_unique(array_column($presentations, 'file'));
 if (!file_exists($dstPath . 'slides')) {
     mkdir($dstPath . 'slides');
 }
+$contents = extractCSV($dstPath . 'content.coords', [0 => 'window', 5 => 'x', 6 => 'y', 7 => 'w', 8 => 'h']);
+$contents = array_column($contents, null, 'window');
+$coords = $contents['PresentationWindow'];
 foreach ($presentationFiles as $pdf) {
-    exec('php extractPresentationSlides.php --source='. $pdf . ' --width=640 --height=480 --save=' . $dstPath . 'slides' . DS . basename($pdf, '.pdf'));
+    execute('php extractPresentationSlides.php --source='. $pdf .
+        ' --width=' . $coords['w'] . ' --height=' . $coords['h'] .
+        ' --save=' . $dstPath . 'slides' . DS . basename($pdf, '.pdf'));
 }
 
 /** Combine video with presentation */
@@ -93,10 +86,10 @@ foreach ($presentations as $key => $p) {
     $offset = ($p['time'] - $presentations[0]['time']) / 1000;
     $sources[] = '-i ' . $slide;
     $filters[] = (0 === $key ? '[0:v]' : '[out]') . '[' . ($key + 1) . ':v]' .
-        ' overlay=241:40:enable=\'between(t,' . $offset . ',7200)\' [out]';
+        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' . $offset . ',7200)\' [out]';
 }
 
-exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.flv ' .
+execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.flv ' .
     implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
     '" -map "[out]" -map a:0 -c:v flv -c:a copy ' . $dstPath . 'video_presentation.flv');
 
