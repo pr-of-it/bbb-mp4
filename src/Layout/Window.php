@@ -7,6 +7,14 @@ class Window
 {
     public $name;
 
+    const TITLES = [
+        'PresentationWindow' => 'Презентация',
+        'VideoDock'          => 'Веб-камера',
+        'ChatWindow'         => 'Чат',
+        'UsersWindow'        => 'Пользователи',
+        'Deskshare'          => 'Трансляция рабочего стола',
+    ];
+
     public function __construct(StyleSheet $styles, array $props = [])
     {
         parent::__construct($styles, $props);
@@ -17,19 +25,35 @@ class Window
 
     public function createTitleBar()
     {
-        $titleBar = new TitleBar($this->styles);
+        $titleBar = new TitleBar($this->styles, array_merge($this->getContentCoordinates(), ['pad' => $this->pad]));
 
         $this->addChild($titleBar);
+        $this->addOffset('top', $titleBar->h + $this->pad);
+    }
+
+    public function createContent()
+    {
+        $content = new Content($this->styles, $this->getContentCoordinates());
+
+        $this->addChild($content);
+    }
+
+    public function getCoordinates()
+    {
+        return array_merge(
+            [$this->name],
+            [$this->x, $this->y, $this->w, $this->h],
+            array_values($this->getContentCoordinates())
+        );
     }
 
     public function getContentCoordinates()
     {
         return [
-            $this->name,
-            $this->absX + $this->offset[3],
-            $this->absY + $this->offset[0],
-            $this->absW - $this->offset[1] - $this->offset[3],
-            $this->absH - $this->offset[0] - $this->offset[2],
+            'x' => $this->x + $this->pad + $this->offset['left'],
+            'y' => $this->y + $this->pad + $this->offset['top'],
+            'w' => $this->w - $this->pad * 2 - $this->offset['left'] - $this->offset['right'],
+            'h' => $this->h - $this->pad * 2 - $this->offset['top'] - $this->offset['bottom'],
         ];
     }
 }

@@ -8,7 +8,6 @@ function halt($message = null)
 {
     if (null !== $message) {
         $message .= "\n";
-        var_dump($message);
         fwrite(STDERR, $message);
     }
     exit(1);
