@@ -5,6 +5,7 @@ $startTime = time();
 /**
  * @use php process.php --src=./source --width=1280 --height=720 --dst=./results/
  */
+require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
 define('DS', DIRECTORY_SEPARATOR);
@@ -51,8 +52,11 @@ if (empty($soundStart)) {
 
 /** Combine layout with sound */
 echo '...combining layout with sound' . PHP_EOL;
-execute('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
-    $dstPath . 'layout.png -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy -shortest ' .
+$events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
+$firstTimestamp = $events->findFirstTimestamp();
+$soundOffset = ($soundStart - $firstTimestamp) / 1000;
+execute('ffmpeg -loglevel quiet -stats -y -itsoffset ' . $soundOffset . ' -i ' . $dstPath . $soundStart . '.sound.wav ' .
+    ' -loop 1 -i ' . $dstPath . 'layout.png -map 0:0 -map 1:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy -shortest ' .
     $dstPath . 'video.avi');
 
 /** Prepare presentation events */
@@ -84,10 +88,10 @@ $sources = [];
 $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
-    $offset = ($p['time'] - $presentations[0]['time']) / 1000;
+    $offset = ($p['time'] - $firstTimestamp) / 1000;
     $sources[] = '-i ' . $slide;
     $filters[] = (0 === $key ? '[0:v]' : '[out]') . '[' . ($key + 1) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' . $offset . ',7200)\' [out]';
+        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' . $offset . ',100000)\' [out]';
 }
 
 exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.avi ' .
