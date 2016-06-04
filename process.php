@@ -50,15 +50,6 @@ if (empty($soundStart)) {
     halt('Sound preparation fault. Sound file not found.');
 }
 
-/** Combine layout with sound */
-echo '...combining layout with sound' . PHP_EOL;
-$events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
-$firstTimestamp = $events->findFirstTimestamp();
-$soundOffset = ($soundStart - $firstTimestamp) / 1000;
-execute('ffmpeg -loglevel quiet -stats -y -itsoffset ' . $soundOffset . ' -i ' . $dstPath . $soundStart . '.sound.wav ' .
-    ' -loop 1 -i ' . $dstPath . 'layout.png -map 0:0 -map 1:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy -shortest ' .
-    $dstPath . 'video.avi');
-
 /** Prepare presentation events */
 echo '...preparing presentation events' . PHP_EOL;
 execute('php extractPresentationEvents.php --path=' . $srcPath . 'presentation ' .
@@ -88,16 +79,19 @@ $sources = [];
 $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
-    $offset = ($p['time'] - $firstTimestamp) / 1000;
+    $offset = ($p['time'] - $soundStart) / 1000;
+    $nextOffset =
+        isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $slide;
-    $filters[] = (0 === $key ? '[0:v]' : '[out]') . '[' . ($key + 1) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' . $offset . ',100000)\' [out]';
+    $filters[] = (0 === $key ? '[1:v]' : '[out]') . '[' . ($key + 2) . ':v]' .
+        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
+        $offset . ',' . $nextOffset . ')\' [out]';
 }
 
-exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . 'video.avi ' .
-    implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
-    '" -map "[out]" -map a:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
-    $dstPath . 'video_presentation.avi');
+exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
+    $dstPath . 'layout.png ' . implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
+    '" -map "[out]" -map 0:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
+    '-shortest ' . $dstPath . 'video_presentation.avi');
 
 $workTime = time() - $startTime;
 $hours = floor($workTime / 3600);
