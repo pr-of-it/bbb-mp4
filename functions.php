@@ -1,5 +1,18 @@
 <?php
-/*
+
+define('DS', DIRECTORY_SEPARATOR);
+
+/**
+ * Output a message to stdout with correct end of line
+ * 
+ * @param string $message
+ */
+function writeLn(string $message)
+{
+    echo $message . PHP_EOL;
+}
+
+/**
  * Output an error to stderr
  *
  * @param string $message
@@ -13,7 +26,7 @@ function halt($message = null)
     exit(1);
 }
 
-/*
+/**
  * Executes the console command and checks the result of its execution
  *
  * @param string $command
@@ -34,7 +47,7 @@ function execute(string $command, string $output = null)
     }
 }
 
-/*
+/**
  * Extracts data from a CSV-file and returns an array of CSV data elements
  *
  * @param string $src

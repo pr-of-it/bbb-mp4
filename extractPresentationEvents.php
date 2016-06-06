@@ -5,8 +5,6 @@
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
-define('DS', DIRECTORY_SEPARATOR);
-
 $options = getopt('', ['path:', 'pdf:', 'src:', 'dst:']);
 $presentationFilePath = realpath($options['path']);
 $srcFileName = realpath($options['src']);

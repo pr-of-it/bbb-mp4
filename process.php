@@ -8,8 +8,6 @@ $startTime = time();
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
-define('DS', DIRECTORY_SEPARATOR);
-
 $options = getopt('', ['src:', 'width:', 'height:', 'dst:']);
 $srcPath = realpath($options['src']) . DS;
 $width = $options['width'] ?? 1280;
@@ -25,18 +23,18 @@ if (!is_readable($dstPath)) {
 $dstPath = realpath($dstPath) . DS;
 
 /** Prepare layout and content coordinates */
-echo '...preparing layout' . PHP_EOL;
+writeLn('...preparing layout');
 execute('php makeLayout.php --width=' . $width . ' --height=' . $height .
     ' --dst=' . $dstPath . 'layout.png --pad=10 --fill-content-zone',
     $dstPath . 'content.coords');
 
 /** Prepare voice events */
-echo '...preparing voice events' . PHP_EOL;
+writeLn('...preparing voice events');
 execute('php extractVoiceEvents.php --src=' . $srcPath . 'events.xml',
     $dstPath . 'voice.events');
 
 /** Prepare sound */
-echo '...preparing sound' . PHP_EOL;
+writeLn('...preparing sound');
 execute('php makeSound.php --src=' . $dstPath . 'voice.events' .
     ' --src-dir=' .$srcPath . DS . 'audio --dst=' .
     $dstPath . 'sound.wav');
@@ -51,13 +49,13 @@ if (empty($soundStart)) {
 }
 
 /** Prepare presentation events */
-echo '...preparing presentation events' . PHP_EOL;
+writeLn('...preparing presentation events');
 execute('php extractPresentationEvents.php --path=' . $srcPath . 'presentation ' .
     '--src=' . $srcPath . 'events.xml --dst=' . $dstPath . 'events.wp.xml',
     $dstPath . 'presentation.events');
 
 /** Prepare presentation slides */
-echo '...preparing presentation slides' . PHP_EOL;
+writeLn('...preparing presentation slides');
 $presentations = extractCSV($dstPath . 'presentation.events', ['time', 'file', 'slide']);
 $presentationFiles = array_unique(array_column($presentations, 'file'));
 if (!file_exists($dstPath . 'slides')) {
@@ -73,7 +71,7 @@ foreach ($presentationFiles as $pdf) {
 }
 
 /** Combine video with presentation */
-echo '...combining video with presentation' . PHP_EOL;
+writeLn('...combining video with presentation');
 
 $sources = [];
 $filters = [];
@@ -97,4 +95,4 @@ $workTime = time() - $startTime;
 $hours = floor($workTime / 3600);
 $minutes = floor(($workTime % 3600) / 60);
 $seconds = $workTime % 60;
-echo 'Total working time: ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ' . PHP_EOL;
+writeLn('Total working time: ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ');

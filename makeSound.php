@@ -5,8 +5,6 @@
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
-define('DS', DIRECTORY_SEPARATOR);
-
 $options = getopt('', ['src:', 'src-dir:', 'dst:']);
 $srcFileName = realpath($options['src']);
 $srcDirName  = realpath($options['src-dir']);
