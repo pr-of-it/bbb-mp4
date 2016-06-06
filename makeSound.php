@@ -5,8 +5,6 @@
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
 
-define('DS', DIRECTORY_SEPARATOR);
-
 $options = getopt('', ['src:', 'src-dir:', 'dst:']);
 $srcFileName = realpath($options['src']);
 $srcDirName  = realpath($options['src-dir']);
@@ -41,7 +39,7 @@ fclose($src);
 
 if (isset($firstFragmentSource)) {
     $execString =
-        'sox -m' . implode('', $fragments) . ' -b 16 ' .
+        'sox -m' . implode('', $fragments) . ' -b 16 -r 44100 ' .
         dirname($dstFileName) . DS . $firstFragmentStart . '.' . basename($dstFileName);
     exec($execString);
     echo 'Sound assembly is completed' .PHP_EOL;
