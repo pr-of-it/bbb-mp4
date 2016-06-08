@@ -9,9 +9,9 @@ namespace ProfIT\Bbb\Layout;
 
 class Box
 {
-    const COLOR_BLACK = '#000000';
-    const COLOR_GRAY = '#CCCCCC';
-    const COLOR_WHITE = '#FFFFFF';
+    const COLOR_BLACK       = '#000000';
+    const COLOR_GRAY        = '#CCCCCC';
+    const COLOR_WHITE       = '#FFFFFF';
     const DEFAULT_FONT_SIZE = 12;
 
     /** @var int coordinates and sizes */
@@ -25,10 +25,10 @@ class Box
 
     /** @var array content offset */
     public $offset = [
-        'top' => 0,
-        'right' => 0,
+        'top'    => 0,
+        'right'  => 0,
         'bottom' => 0,
-        'left' => 0
+        'left'   => 0
     ];
 
     /** @var Box */
