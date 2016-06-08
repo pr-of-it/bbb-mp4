@@ -36,9 +36,9 @@ execute('php extractVoiceEvents.php --src=' . $srcPath . 'events.xml',
 /** Prepare sound */
 writeLn('...preparing sound');
 execute('php makeSound.php --src=' . $dstPath . 'voice.events' .
-    ' --src-dir=' .$srcPath . DS . 'audio --dst=' .
+    ' --src-dir=' . $srcPath . DS . 'audio --dst=' .
     $dstPath . 'sound.wav');
-foreach(scandir($dstPath) as $file) {
+foreach (scandir($dstPath) as $file) {
     if (preg_match('~(\d+).sound.wav~', $file, $m)) {
         $soundStart = $m[1];
         break;
@@ -65,7 +65,7 @@ $contents = extractCSV($dstPath . 'content.coords', [0 => 'window', 5 => 'x', 6 
 $contents = array_column($contents, null, 'window');
 $coords = $contents['PresentationWindow'];
 foreach ($presentationFiles as $pdf) {
-    execute('php extractPresentationSlides.php --source='. $pdf .
+    execute('php extractPresentationSlides.php --source=' . $pdf .
         ' --width=' . $coords['w'] . ' --height=' . $coords['h'] .
         ' --save=' . $dstPath . 'slides' . DS . basename($pdf, '.pdf'));
 }
@@ -77,12 +77,14 @@ $sources = [];
 $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
+    $slideSize = getimagesize($slide);
+    $ySlideOffset = round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2));
     $offset = ($p['time'] - $soundStart) / 1000;
     $nextOffset =
         isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $slide;
     $filters[] = (0 === $key ? '[1:v]' : '[out]') . '[' . ($key + 2) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
+        ' overlay=' . $coords['x'] . ':' . $ySlideOffset . ':enable=\'between(t,' .
         $offset . ',' . $nextOffset . ')\' [out]';
 }
 
