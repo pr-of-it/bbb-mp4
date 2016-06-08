@@ -62,8 +62,8 @@ class Box
     {
         if ($this->hidden) return;
 
-        imagefilledrectangle($canvas, $this->x, $this->y, ($this->x + $this->w) - 1, ($this->y + $this->h) - 1, self::color($canvas, $this->bgColor));
-        imagerectangle($canvas, $this->x, $this->y, ($this->x + $this->w) - 1, ($this->y + $this->h) - 1, self::color($canvas, $this->bdColor));
+        imagefilledrectangle($canvas, $this->x, $this->y, $this->x + $this->w - 1, $this->y + $this->h - 1, self::color($canvas, $this->bgColor));
+        imagerectangle($canvas, $this->x, $this->y, $this->x + $this->w - 1, $this->y + $this->h - 1, self::color($canvas, $this->bdColor));
 
         foreach ($this->children as $child) {
             /** @var Window $child */
