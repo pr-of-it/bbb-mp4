@@ -78,14 +78,14 @@ $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
     $slideSize = getimagesize($slide);
-    $ySlideOffset = round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2));
-    $offset = ($p['time'] - $soundStart) / 1000;
-    $nextOffset =
+    $slideOffsetY = round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2));
+    $slideStartTime = ($p['time'] - $soundStart) / 1000;
+    $slideEndTime =
         isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $slide;
     $filters[] = (0 === $key ? '[1:v]' : '[out]') . '[' . ($key + 2) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $ySlideOffset . ':enable=\'between(t,' .
-        $offset . ',' . $nextOffset . ')\' [out]';
+        ' overlay=' . $coords['x'] . ':' . $slideOffsetY . ':enable=\'between(t,' .
+        $slideStartTime . ',' . $slideEndTime . ')\' [out]';
 }
 
 exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
