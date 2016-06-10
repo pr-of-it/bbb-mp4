@@ -12,50 +12,29 @@ $events = new \ProfIT\Bbb\EventsFile($srcFileName);
 
 try {
     $fragments = $events->extractFragments(
-        '~<event.+eventname="ParticipantJoinEvent">~',
+        '~<event.+module="PARTICIPANT"\s+eventname="Participant(Left|Join)Event">~',
         '~</event>~'
     );
 
     foreach ($fragments as $fragment) {
         $eventParams = [];
 
-        $eventParams[0] = 'join';
-
+        if (preg_match('~<event.+eventname="Participant(\w+)Event">~', $fragment, $m)) {
+            $eventParams[0] = $m[1];
+        }
         if (preg_match('~<event\s+timestamp="(\d+)".+>~U', $fragment, $m)) {
             $eventParams[1] = $m[1];
         }
         if (preg_match('~<userId>(\w+)</userId>~', $fragment, $m)) {
             $eventParams[2] = $m[1];
         }
-        if (preg_match('~<name>(.+)</name>~', $fragment, $m)) {
-            $eventParams[3] = $m[1];
+        if (preg_match('~<name>(.+)</name>~u', $fragment, $m)) {
+            $eventParams[3] = $m[1] . '';
         }
 
         echo implode(',', $eventParams) . PHP_EOL;
     }
-
-    $fragments = $events->extractFragments(
-        '~<event.+eventname="ParticipantLeftEvent">~',
-        '~</event>~'
-    );
-
-    foreach ($fragments as $fragment) {
-        $eventParams = [];
-
-        $eventParams[0] = 'left';
-
-        if (preg_match('~<event\s+timestamp="(\d+)".+>~U', $fragment, $m)) {
-            $eventParams[1] = $m[1];
-        }
-        if (preg_match('~<userId>(\w+)</userId>~', $fragment, $m)) {
-            $eventParams[2] = $m[1];
-        }
-
-        $eventParams[3] = 'name';
-        
-
-        echo implode(',', $eventParams) . PHP_EOL;
-    }
+    
 } catch (\ProfIT\Bbb\Exception $e) {
     halt($e->getMessage() . PHP_EOL);
 }
