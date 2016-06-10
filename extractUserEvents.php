@@ -19,22 +19,23 @@ try {
     foreach ($fragments as $fragment) {
         $eventParams = [];
 
-        if (preg_match('~<event.+eventname="Participant(\w+)Event">~', $fragment, $m)) {
-            $eventParams[0] = $m[1];
-        }
-        if (preg_match('~<event\s+timestamp="(\d+)".+>~U', $fragment, $m)) {
+        if (preg_match('~<event\s+timestamp="(\d+)".+eventname="Participant(\w+)Event">~', $fragment, $m)) {
+            $eventParams[0] = $m[2];
             $eventParams[1] = $m[1];
         }
         if (preg_match('~<userId>(\w+)</userId>~', $fragment, $m)) {
             $eventParams[2] = $m[1];
         }
         if (preg_match('~<name>(.+)</name>~u', $fragment, $m)) {
-            $eventParams[3] = $m[1] . '';
+            $eventParams[3] = $m[1];
+        }
+        if ('Left' == $eventParams[0]) {
+            $eventParams[3] = '';
         }
 
         echo implode(',', $eventParams) . PHP_EOL;
     }
-    
+
 } catch (\ProfIT\Bbb\Exception $e) {
     halt($e->getMessage() . PHP_EOL);
 }
