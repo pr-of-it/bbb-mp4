@@ -24,12 +24,12 @@ try {
         $eventParams = [];
 
         preg_match('~<event\s+timestamp="(\d+)".+eventname="Participant(\w+)Event">~', $fragment, $m);
-            $eventParams[0] = lcfirst($m[2]);
-            $eventParams[1] = $m[1];
+        $eventParams[0] = lcfirst($m[2]);
+        $eventParams[1] = $m[1];
         preg_match('~<userId>(\w+)</userId>~', $fragment, $m);
-            $eventParams[2] = $m[1];
+        $eventParams[2] = $m[1];
         preg_match('~<name>(.+)</name>~u', $fragment, $m);
-            $eventParams[3] = $m[1] ?? '';
+        $eventParams[3] = $m[1] ?? '';
 
         echo implode(',', $eventParams) . PHP_EOL;
     }
