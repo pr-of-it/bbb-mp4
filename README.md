@@ -40,6 +40,12 @@ BigBlueButton Record Process
 выполнения makeLayout. Задается путь к результату работы makeLayout и путь к файлу, в котором будет сохранено
 изображение.
 
+## extractUserEvents
+    php extractUserEvents.php --src=events.xml > user.events
+
+Считывает события, связанные с входом и выходом пользователей в конференецию, из файла events.xml.
+И выводит их в stdout как CSV "left/join,timestamp,userId,name".
+
 # Окна (они же области экрана)
 ## NotesWindow
 ## BroadcastWindow
