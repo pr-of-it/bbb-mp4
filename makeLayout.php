@@ -20,5 +20,5 @@ $layout->generatePng($dstFileName, $fillContent);
 
 foreach ($layout->getWindows() as $window) {
     /** @var \ProfIT\Bbb\Layout\Window $window */
-    echo implode(',', $window->getCoordinates()) . PHP_EOL;
+    fputcsv(STDOUT, $window->getCoordinates());
 }
