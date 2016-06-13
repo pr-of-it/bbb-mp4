@@ -8,6 +8,10 @@ require __DIR__ . '/functions.php';
 $options = getopt('', ['src:']);
 $srcFileName = realpath($options['src']);
 
+if (!is_readable($srcFileName)) {
+    halt('File does not exist or is not readable');
+}
+
 $events = new \ProfIT\Bbb\EventsFile($srcFileName);
 
 try {
@@ -24,8 +28,8 @@ try {
         $eventParams[1] = $m[1];
         preg_match('~<filename>(.+)</filename>~', $fragment, $m);
         $eventParams[2] = $m[1];
-
-        echo implode(',', $eventParams) . PHP_EOL;
+        
+        fputcsv(STDOUT, $eventParams);
     }
 } catch (\ProfIT\Bbb\Exception $e) {
     halt($e->getMessage() . PHP_EOL);
