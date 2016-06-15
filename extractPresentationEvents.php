@@ -33,7 +33,7 @@ try {
             $eventParams[2] = $m[2];
         }
 
-        echo implode(',', $eventParams) . PHP_EOL;
+        fputcsv(STDOUT, $eventParams);
     }
 } catch (\ProfIT\Bbb\Exception $e) {
     halt($e->getMessage() . PHP_EOL);

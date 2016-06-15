@@ -9,6 +9,10 @@ $options = getopt('', ['src:', 'dst:']);
 $srcFileName = realpath($options['src']);
 $dstFileName = $options['dst'];
 
+if (!is_readable($srcFileName)) {
+    halt('File does not exist or is not readable');
+}
+
 $events = new \ProfIT\Bbb\EventsFile($srcFileName);
 
 try {
@@ -31,7 +35,7 @@ try {
             $eventParams[2] = $m[1];
         }
 
-        echo implode(',', $eventParams) . PHP_EOL;
+        fputcsv(STDOUT, $eventParams);
     }
 } catch (\ProfIT\Bbb\Exception $e) {
     halt($e->getMessage() . PHP_EOL);
