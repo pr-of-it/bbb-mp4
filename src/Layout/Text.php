@@ -18,8 +18,8 @@ class Text
         $this->bgColor   = self::COLOR_WHITE;
         $this->bdColor   = self::COLOR_WHITE;
         $this->fontColor = $this->styles->rules['.mdiWindowTitle']['color'];
-        $this->fontSize  = $this->styles->rules['.mdiWindowTitle']['fontSize'];
-        $this->h         = (int)$this->styles->rules['.videoViewStyleNoFocus']['headerHeight'];
+        $this->fontSize  = $this->styles->rules['.mdiWindowTitle']['fontSize'] * 0.75;
+        $this->h         = $this->styles->rules['.mdiWindowTitle']['fontSize'] * 1.5;
         
         $this->text = $text;
     }
