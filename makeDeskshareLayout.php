@@ -25,7 +25,7 @@ $layout->addCustomWindow([
     'h' => 0.8,
 ]);
 $layout->setMarkedWindows(['Deskshare']);
-$layout->generatePng($dstFileName, $fillContent, true);
+$layout->generatePng($dstFileName, $fillContent, true, true);
 
 foreach ($layout->getWindows() as $window) {
     /** @var \ProfIT\Bbb\Layout\Window $window */

@@ -86,6 +86,15 @@ class Layout
         ]);
     }
 
+    public function addWindowText(string $windowName, string $text)
+    {
+        foreach ($this->windows as $window) {
+            if ($window->name === $windowName) {
+                $window->addText($text);
+            }
+        }
+    }
+
     public function getWindows()
     {
         if (count($this->markedWindows) > 0) {
@@ -101,7 +110,7 @@ class Layout
         $this->markedWindows = $marked;
     }
 
-    public function generatePng($dstFileName, bool $fillContent, bool $bgTransparent = false)
+    public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
 
@@ -119,7 +128,9 @@ class Layout
                 continue;
             }
 
-            $window->createTitleBar();
+            if (true === $drawTitle) {
+                $window->createTitleBar();
+            }
 
             if (true === $fillContent) {
                 $window->createContent();

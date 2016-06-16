@@ -70,8 +70,8 @@ foreach ($presentationFiles as $pdf) {
         ' --save=' . $dstPath . 'slides' . DS . basename($pdf, '.pdf'));
 }
 
-/** Combine video with presentation */
-writeLn('...combining video with presentation');
+/** Prepare presentation filters */
+writeLn('...preparing presentation filters');
 
 $sources = [];
 $filters = [];
@@ -87,6 +87,36 @@ foreach ($presentations as $key => $p) {
         ' overlay=' . $coords['x'] . ':' . $slideOffsetY . ':enable=\'between(t,' .
         $slideStartTime . ',' . $slideEndTime . ')\' [out]';
 }
+
+/** Prepare user events */
+writeLn('...preparing user events');
+execute('php extractUserEvents.php --src=' . $srcPath . 'events.xml',
+    $dstPath . 'user.events');
+$userEvents = extractCSV($dstPath . 'user.events', [0 => 'action', 1 => 'time', 2 => 'id', 3 => 'name']);
+
+/** Prepare user-list images and filters */
+writeLn('...preparing user-list images');
+$userList = [];
+$coords = $contents['UsersWindow'];
+foreach ($userEvents as $key => $event) {
+    if ('join' === $event['action']) {
+        $userList[$event['id']] = $event['name'];
+    } elseif ('left' === $event['action']) {
+        unset($userList[$event['id']]);
+    }
+    generateUserListImage($dstPath . 'users', $coords['w'], $coords['h'], $event['time'], $userList);
+    $image = $dstPath . 'users' . DS . 'list' . $event['time'] . '.png';
+    $imageStartTime = ($event['time'] - $soundStart) / 1000;
+    $imageEndTime =
+        isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
+    $sources[] = '-i ' . $image;
+    $filters[] = '[out][' . ($key + 2 + count($presentations)) . ':v]' .
+        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
+        $imageStartTime . ',' . $imageEndTime . ')\' [out]';
+}
+
+/** Combine video */
+writeLn('...combining video');
 
 exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
     $dstPath . 'layout.png ' . implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .

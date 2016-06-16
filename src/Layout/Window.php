@@ -56,4 +56,11 @@ class Window
             'h' => $this->h - $this->pad * 2 - $this->offset['top'] - $this->offset['bottom'],
         ];
     }
+    
+    public function addText(string $text) {
+        $textRow = new Text($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 10]), $text);
+
+        $this->addChild($textRow);
+        $this->addOffset('top', $textRow->h + $this->pad);
+    }
 }
