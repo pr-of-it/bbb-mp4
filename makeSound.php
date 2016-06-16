@@ -38,7 +38,7 @@ while ($csv = fgetcsv($src, 1024)) {
 fclose($src);
 
 if (isset($firstFragmentSource)) {
-    execute('sox -m' . implode('', $fragments) . ' -b 16 -r 44100 -G ' .
+    exec('sox -m' . implode('', $fragments) . ' -b 16 -r 44100 -G ' .
         dirname($dstFileName) . DS . $firstFragmentStart . '.' . basename($dstFileName));
 } else {
     halt('Voice fragments not found' . PHP_EOL);
