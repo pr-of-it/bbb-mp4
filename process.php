@@ -104,8 +104,8 @@ foreach ($userEvents as $key => $event) {
     } elseif ('left' === $event['action']) {
         unset($userList[$event['id']]);
     }
-    generateUserListImage($dstPath . 'users', $coords['w'], $coords['h'], $event['time'], $userList);
     $image = $dstPath . 'users' . DS . 'list.' . $event['time'] . '.png';
+    generateListImage($image, $coords, $userList);
     $imageStartTime = ($event['time'] - $soundStart) / 1000;
     $imageEndTime =
         isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';

@@ -86,13 +86,19 @@ class Layout
         ]);
     }
 
-    public function addWindowText(string $windowName, string $text)
+    public function addListWindow(array $params, array $list)
     {
-        foreach ($this->windows as $window) {
-            if ($window->name === $windowName) {
-                $window->addText($text);
-            }
+        $listWindow = new Window($this->styles, [
+            'x'      => (int) round(((float)$params['x']) * $this->width),
+            'y'      => (int) round(((float)$params['y']) * $this->height),
+            'w'      => (int) round(((float)$params['w']) * $this->width),
+            'h'      => (int) round(((float)$params['h']) * $this->height),
+            'pad'    => $this->pad,
+        ]);
+        foreach ($list as $text) {
+            $listWindow->addText($text);
         }
+        $this->windows[] = $listWindow;
     }
 
     public function getWindows()

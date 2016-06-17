@@ -57,8 +57,8 @@ class Window
         ];
     }
     
-    public function addText(string $text) {
-        $textRow = new Text($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text);
+    public function createTextRow(string $text) {
+        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text);
 
         $this->addChild($textRow);
         $this->addOffset('top', $textRow->h + $this->pad);

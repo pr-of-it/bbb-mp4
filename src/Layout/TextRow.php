@@ -4,7 +4,7 @@ namespace ProfIT\Bbb\Layout;
 
 use ProfIT\Bbb\Layout;
 
-class Text
+class TextRow
     extends Box
 {
     const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
@@ -28,14 +28,6 @@ class Text
     {
         parent::render($canvas);
 
-        $text = $this->text;
-
-        $textHeight = $this->fontSize;
-        $offsetY = floor(($this->h - $textHeight) / 2);
-
-        $x = $this->x + $this->pad;
-        $y = $this->y + $this->fontSize + $offsetY;
-
-        imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), self::FONT_PATH, $text);
+        self::renderText($canvas, $this->text);
     }
 }

@@ -23,15 +23,7 @@ class TitleBar
     public function render($canvas)
     {
         parent::render($canvas);
-
-        $text = Window::TITLES[$this->parent->name] ?? $this->parent->name;
-
-        $textHeight = $this->fontSize;
-        $offsetY = floor(($this->h - $textHeight) / 2);
-
-        $x = $this->x + $this->pad;
-        $y = $this->y + $this->fontSize + $offsetY;
-
-        imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), self::FONT_PATH, $text);
+        
+        self::renderText($canvas, Window::TITLES[$this->parent->name] ?? $this->parent->name);
     }
 }
