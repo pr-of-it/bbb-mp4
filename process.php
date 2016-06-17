@@ -7,6 +7,7 @@ $startTime = time();
  */
 require __DIR__ . '/autoload.php';
 require __DIR__ . '/functions.php';
+require __DIR__ . '/imageFunctions.php';
 
 $options = getopt('', ['src:', 'width:', 'height:', 'dst:']);
 $srcPath = realpath($options['src']) . DS;
