@@ -103,6 +103,8 @@ foreach ($userEvents as $key => $event) {
         $userList[$event['id']] = $event['name'];
     } elseif ('left' === $event['action']) {
         unset($userList[$event['id']]);
+    } else {
+        continue;
     }
     $image = $dstPath . 'users' . DS . 'list.' . $event['time'] . '.png';
     generateListImage($image, $coords, $userList);
