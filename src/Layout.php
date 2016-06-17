@@ -96,7 +96,7 @@ class Layout
             'pad'    => $this->pad,
         ]);
         foreach ($list as $text) {
-            $listWindow->addText($text);
+            $listWindow->createTextRow($text);
         }
         $this->windows[] = $listWindow;
     }
