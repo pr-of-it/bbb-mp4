@@ -86,6 +86,21 @@ class Layout
         ]);
     }
 
+    public function addListWindow(array $params, array $list)
+    {
+        $listWindow = new Window($this->styles, [
+            'x'      => (int) round(((float)$params['x']) * $this->width),
+            'y'      => (int) round(((float)$params['y']) * $this->height),
+            'w'      => (int) round(((float)$params['w']) * $this->width),
+            'h'      => (int) round(((float)$params['h']) * $this->height),
+            'pad'    => $this->pad,
+        ]);
+        foreach ($list as $text) {
+            $listWindow->createTextRow($text);
+        }
+        $this->windows[] = $listWindow;
+    }
+
     public function getWindows()
     {
         if (count($this->markedWindows) > 0) {
@@ -101,7 +116,7 @@ class Layout
         $this->markedWindows = $marked;
     }
 
-    public function generatePng($dstFileName, bool $fillContent, bool $bgTransparent = false)
+    public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
 
@@ -119,7 +134,9 @@ class Layout
                 continue;
             }
 
-            $window->createTitleBar();
+            if (true === $drawTitle) {
+                $window->createTitleBar();
+            }
 
             if (true === $fillContent) {
                 $window->createContent();

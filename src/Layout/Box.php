@@ -70,6 +70,17 @@ class Box
             $child->render($canvas);
         }
     }
+    
+    public function renderText($canvas, string $text)
+    {
+        $textHeight = $this->fontSize;
+        $offsetY = floor(($this->h - $textHeight) / 2);
+
+        $x = $this->x + $this->pad;
+        $y = $this->y + $this->fontSize + $offsetY;
+
+        imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
+    }
 
     public function addChild(Box $child)
     {
