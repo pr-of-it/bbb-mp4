@@ -27,7 +27,11 @@ try {
         $eventParams[1] = $m[1];
 
         preg_match('~<message>.+<!\[CDATA\[(.+)\]\]>.+</message>~ms', $fragment, $m);
-        $eventParams[2] = $m[1];
+        if (isset($m[1])) {
+            $eventParams[2] = $m[1];
+        } else {
+            continue;
+        }
         preg_match('~<u>(.+)</u>~', $eventParams[2], $m);
         if (isset($m[1])) {
             $eventParams[2] = $m[1];
