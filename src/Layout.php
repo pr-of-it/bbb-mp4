@@ -144,7 +144,7 @@ class Layout
             }
 
             if (true === $fillContent && false === in_array($window->name, $this->unfilledWindows)) {
-                $window->createContent();
+                $window->fillContentBackground();
             }
 
             $window->render($canvas);

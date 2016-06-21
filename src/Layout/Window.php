@@ -31,7 +31,7 @@ class Window
         $this->addOffset('top', $titleBar->h + $this->pad);
     }
 
-    public function createContent()
+    public function fillContentBackground()
     {
         $content = new Content($this->styles, $this->getContentCoordinates());
 
