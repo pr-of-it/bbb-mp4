@@ -17,6 +17,7 @@ class Layout
 
     protected $windows = [];
     protected $markedWindows = [];
+    protected $unfilledWindows = [];
 
     public function __construct(string $filename, string $name, StyleSheet $styles)
     {
@@ -116,6 +117,10 @@ class Layout
         $this->markedWindows = $marked;
     }
 
+    public function setUnfilledWindows(array $unfilled) {
+        $this->unfilledWindows = $unfilled;
+    }
+
     public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
@@ -138,7 +143,7 @@ class Layout
                 $window->createTitleBar();
             }
 
-            if (true === $fillContent) {
+            if (true === $fillContent && false === in_array($window->name, $this->unfilledWindows)) {
                 $window->createContent();
             }
 
