@@ -19,6 +19,8 @@ class Box
     public $y;
     public $w;
     public $h;
+    
+    public $yCorrection;
 
     /** @var int padding */
     public $pad = 0;
@@ -62,8 +64,9 @@ class Box
     {
         if ($this->hidden) return;
 
-        imagefilledrectangle($canvas, $this->x, $this->y, $this->x + $this->w - 1, $this->y + $this->h - 1, self::color($canvas, $this->bgColor));
-        imagerectangle($canvas, $this->x, $this->y, $this->x + $this->w - 1, $this->y + $this->h - 1, self::color($canvas, $this->bdColor));
+        $yCorrection = $this->parent->yCorrection ?? 0;
+        imagefilledrectangle($canvas, $this->x, $this->y + $yCorrection, $this->x + $this->w - 1, $this->y + $yCorrection + $this->h - 1, self::color($canvas, $this->bgColor));
+        imagerectangle($canvas, $this->x, $this->y + $yCorrection, $this->x + $this->w - 1, $this->y + $yCorrection + $this->h - 1, self::color($canvas, $this->bdColor));
 
         foreach ($this->children as $child) {
             /** @var Window $child */
@@ -77,7 +80,8 @@ class Box
         $offsetY = floor(($this->h - $textHeight) / 2);
 
         $x = $this->x + $this->pad;
-        $y = $this->y + $this->fontSize + $offsetY;
+        $yCorrection = $this->parent->yCorrection ?? 0;
+        $y = $this->y + $yCorrection + $this->fontSize + $offsetY;
 
         imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
     }
