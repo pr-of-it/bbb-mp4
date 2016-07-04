@@ -88,5 +88,53 @@ class EventsFile
         fclose($src);
         return null;
     }
-    
+
+    /**
+     * @return string|null - отметка времени или null
+     *
+     * @throws \ProfIT\Bbb\Exception
+     */
+    public function findRealFirstTimestamp() {
+        $src = fopen($this->eventsFileName, 'r');
+        if (false === $src) {
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
+        }
+
+        while (false !== $line = fgets($src, 10240)) {
+            $pattern = '~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U';
+            if (preg_match($pattern, $line, $m)) {
+                $timestamp = $m[1];
+                fclose($src);
+                return $timestamp;
+            }
+        }
+
+        fclose($src);
+        return null;
+    }
+
+
+    /**
+     * @return string|null - название мероприятия или null
+     *
+     * @throws \ProfIT\Bbb\Exception
+     */
+    public function findMeetingName() {
+        $src = fopen($this->eventsFileName, 'r');
+        if (false === $src) {
+            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
+        }
+
+        while (false !== $line = fgets($src, 10240)) {
+            $pattern = '~<metadata.+meetingName="(.+)".+>~U';
+            if (preg_match($pattern, $line, $m)) {
+                $name = $m[1];
+                fclose($src);
+                return $name;
+            }
+        }
+
+        fclose($src);
+        return null;
+    }
 }

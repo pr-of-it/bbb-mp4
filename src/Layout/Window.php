@@ -57,19 +57,24 @@ class Window
         ];
     }
     
-    public function createTextRow(string $text) {
-        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text);
+    public function createTextRow(string $text, bool $bold = false) {
+        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text, $bold);
         $this->addChild($textRow);
         $textContentHeight = $textRow->h + $this->pad;
         $this->addOffset('top', $textContentHeight);
 
         $textOverflow = $textRow->cutTextToWidth();
         if (false !== $textOverflow) {
-            $this->createTextRow($textOverflow);
+            $this->createTextRow($textOverflow, $bold);
         }
         if ($this->offset['top'] > $this->h) {
             $this->yCorrection -= $textContentHeight;
             $this->h += $textContentHeight;
         }
+    }
+
+    public function createMessageCaption(string $user, string $time) {
+        $text = $user . ' [' . $time . ']';
+        $this->createTextRow($text);
     }
 }

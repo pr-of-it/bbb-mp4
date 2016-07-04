@@ -10,8 +10,9 @@ class TextRow
     const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
     
     protected $text;
+    protected $bold;
 
-    public function __construct(StyleSheet $styles, array $props = [], string $text)
+    public function __construct(StyleSheet $styles, array $props = [], string $text, bool $bold = false)
     {
         parent::__construct($styles, $props);
 
@@ -22,13 +23,14 @@ class TextRow
         $this->h         = $this->styles->rules['.mdiWindowTitle']['fontSize'] * 1.5;
 
         $this->text = $text;
+        $this->bold = $bold;
     }
 
     public function render($canvas)
     {
         parent::render($canvas);
 
-        self::renderText($canvas, $this->text);
+        self::renderText($canvas, $this->text, $this->bold);
     }
 
     public function cutTextToWidth()

@@ -102,6 +102,26 @@ class Layout
         $this->windows[] = $listWindow;
     }
 
+    public function addChatListWindow(array $params, array $list, EventsFile $events)
+    {
+        $firstTimestamp = $events->findFirstTimestamp();
+        $realFirstTimestamp = $events->findRealFirstTimestamp();
+        $meetingName = $events->findMeetingName();
+        $listWindow = new Window($this->styles, [
+            'x'      => (int) round(((float)$params['x']) * $this->width),
+            'y'      => (int) round(((float)$params['y']) * $this->height),
+            'w'      => (int) round(((float)$params['w']) * $this->width),
+            'h'      => (int) round(((float)$params['h']) * $this->height),
+            'pad'    => $this->pad,
+        ]);
+        $listWindow->createTextRow('Добро пожаловать в ' . $meetingName, true);
+        foreach ($list as $item) {
+            $listWindow->createMessageCaption($item['user'], date('H:i', ($realFirstTimestamp + ($item['time'] - $firstTimestamp)/1000)));
+            $listWindow->createTextRow($item['message']);
+        }
+        $this->windows[] = $listWindow;
+    }
+
     public function getWindows()
     {
         if (count($this->markedWindows) > 0) {

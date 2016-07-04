@@ -130,10 +130,11 @@ $chatEvents = extractCSV($dstPath . 'chat.events', [0 => 'time', 1 => 'user', 2 
 writeLn('...preparing chat-list images');
 $chatList = [];
 $coords = $contents['ChatWindow'];
+$events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
 foreach ($chatEvents as $key => $event) {
-    $chatList[] = $event['user'] . ': ' . $event['message'];
+    $chatList[] = $event;
     $image = $dstPath . 'chat' . DS . 'list.' . $event['time'] . '.png';
-    generateListImage($image, $coords, $chatList);
+    generateChatListImage($image, $coords, $chatList, $events);
     $imageStartTime = ($event['time'] - $soundStart) / 1000;
     $imageEndTime =
         isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
