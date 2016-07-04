@@ -98,6 +98,7 @@ $userEvents = extractCSV($dstPath . 'user.events', [0 => 'action', 1 => 'time', 
 /** Prepare user-list images and filters */
 writeLn('...preparing user-list images');
 $userList = [];
+$userImagesCount = 0;
 $coords = $contents['UsersWindow'];
 foreach ($userEvents as $key => $event) {
     if ('join' === $event['action']) {
@@ -107,6 +108,7 @@ foreach ($userEvents as $key => $event) {
     } else {
         continue;
     }
+    $userImagesCount++;
     $image = $dstPath . 'users' . DS . 'list.' . $event['time'] . '.png';
     generateListImage($image, $coords, $userList);
     $imageStartTime = ($event['time'] - $soundStart) / 1000;
@@ -114,6 +116,29 @@ foreach ($userEvents as $key => $event) {
         isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $image;
     $filters[] = '[out][' . ($key + 2 + count($presentations)) . ':v]' .
+        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
+        $imageStartTime . ',' . $imageEndTime . ')\' [out]';
+}
+
+/** Prepare chat events */
+writeLn('...preparing chat events');
+execute('php extractChatEvents.php --src=' . $srcPath . 'events.xml --dst=' . $dstPath . 'events.wc.xml',
+    $dstPath . 'chat.events');
+$chatEvents = extractCSV($dstPath . 'chat.events', [0 => 'time', 1 => 'user', 2 => 'message']);
+
+/** Prepare chat-list images and filters */
+writeLn('...preparing chat-list images');
+$chatList = [];
+$coords = $contents['ChatWindow'];
+foreach ($chatEvents as $key => $event) {
+    $chatList[] = $event['user'] . ': ' . $event['message'];
+    $image = $dstPath . 'chat' . DS . 'list.' . $event['time'] . '.png';
+    generateListImage($image, $coords, $chatList);
+    $imageStartTime = ($event['time'] - $soundStart) / 1000;
+    $imageEndTime =
+        isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
+    $sources[] = '-i ' . $image;
+    $filters[] = '[out][' . ($key + 2 + count($presentations) + $userImagesCount) . ':v]' .
         ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
         $imageStartTime . ',' . $imageEndTime . ')\' [out]';
 }

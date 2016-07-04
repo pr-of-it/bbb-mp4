@@ -59,8 +59,17 @@ class Window
     
     public function createTextRow(string $text) {
         $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text);
-
         $this->addChild($textRow);
-        $this->addOffset('top', $textRow->h + $this->pad);
+        $textContentHeight = $textRow->h + $this->pad;
+        $this->addOffset('top', $textContentHeight);
+
+        $textOverflow = $textRow->cutTextToWidth();
+        if (false !== $textOverflow) {
+            $this->createTextRow($textOverflow);
+        }
+        if ($this->offset['top'] > $this->h) {
+            $this->yCorrection -= $textContentHeight;
+            $this->h += $textContentHeight;
+        }
     }
 }
