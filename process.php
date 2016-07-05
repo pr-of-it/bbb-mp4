@@ -79,14 +79,15 @@ $filters = [];
 foreach ($presentations as $key => $p) {
     $slide = $dstPath . 'slides' . DS . basename($p['file'], '.pdf') . DS . 'slide-' . $p['slide'] . '.png';
     $slideSize = getimagesize($slide);
-    $slideOffsetY = round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2));
-    $slideStartTime = ($p['time'] - $soundStart) / 1000;
-    $slideEndTime =
-        isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $slide;
-    $filters[] = (0 === $key ? '[1:v]' : '[out]') . '[' . ($key + 2) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $slideOffsetY . ':enable=\'between(t,' .
-        $slideStartTime . ',' . $slideEndTime . ')\' [out]';
+    addImageToFilters(
+        $filters,
+        ($p['time'] - $soundStart) / 1000,
+        isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        $coords['x'],
+        round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2)),
+        $key + 2
+    );
 }
 
 /** Prepare user events */
@@ -111,13 +112,15 @@ foreach ($userEvents as $key => $event) {
     $userImagesCount++;
     $image = $dstPath . 'users' . DS . 'list.' . $event['time'] . '.png';
     generateListImage($image, $coords, $userList);
-    $imageStartTime = ($event['time'] - $soundStart) / 1000;
-    $imageEndTime =
-        isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $image;
-    $filters[] = '[out][' . ($key + 2 + count($presentations)) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
-        $imageStartTime . ',' . $imageEndTime . ')\' [out]';
+    addImageToFilters(
+        $filters,
+        ($event['time'] - $soundStart) / 1000,
+        isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        $coords['x'],
+        $coords['y'],
+        $key + 2 + count($presentations)
+    );
 }
 
 /** Prepare chat events */
@@ -131,17 +134,31 @@ writeLn('...preparing chat-list images');
 $chatList = [];
 $coords = $contents['ChatWindow'];
 $events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
+/** Chat caption from start */
+$image = $dstPath . 'chat' . DS . 'list.' . $soundStart . '.png';
+generateChatListImage($image, $coords, $chatList, $events);
+$sources[] = '-i ' . $image;
+addImageToFilters(
+    $filters,
+    0,
+    isset($chatEvents[0]) ? (($chatEvents[0]['time'] - $soundStart) / 1000) : '100000',
+    $coords['x'],
+    $coords['y'],
+    2 + count($presentations) + $userImagesCount
+);
 foreach ($chatEvents as $key => $event) {
     $chatList[] = $event;
     $image = $dstPath . 'chat' . DS . 'list.' . $event['time'] . '.png';
     generateChatListImage($image, $coords, $chatList, $events);
-    $imageStartTime = ($event['time'] - $soundStart) / 1000;
-    $imageEndTime =
-        isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000';
     $sources[] = '-i ' . $image;
-    $filters[] = '[out][' . ($key + 2 + count($presentations) + $userImagesCount) . ':v]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
-        $imageStartTime . ',' . $imageEndTime . ')\' [out]';
+    addImageToFilters(
+        $filters,
+        ($event['time'] - $soundStart) / 1000,
+        isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        $coords['x'],
+        $coords['y'],
+        $key + 3 + count($presentations) + $userImagesCount
+    );
 }
 
 /** Combine video */

@@ -43,3 +43,20 @@ function generateChatListImage(string $dst, array $coords, array $list, \ProfIT\
     $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'pad' => 5], $list, $events);
     $layout->generatePng($dst, true, false);
 }
+
+/**
+ * Add ffmpeg filter element
+ *
+ * @param array $filters link to ffmpeg filter array
+ * @param double $start image overlay start time
+ * @param double $end image overlay end time
+ * @param string $coordX image x coordinate
+ * @param string $coordY image y coordinate
+ * @param int $num number of filter element
+ */
+function addImageToFilters(&$filters, $start, $end, $coordX, $coordY, $num)
+{
+    $filters[] = (0 === count($filters) ? '[1:v]' : '[out]') . '[' . $num . ':v]' .
+        ' overlay=' . $coordX . ':' . $coordY . ':enable=\'between(t,' .
+        $start . ',' . $end . ')\' [out]';
+}
