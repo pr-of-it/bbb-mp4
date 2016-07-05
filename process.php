@@ -23,6 +23,8 @@ if (!is_readable($dstPath)) {
 }
 $dstPath = realpath($dstPath) . DS;
 
+$events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
+
 /** Prepare layout and content coordinates */
 writeLn('...preparing layout');
 execute('php makeLayout.php --width=' . $width . ' --height=' . $height .
@@ -41,11 +43,11 @@ execute('php makeSound.php --src=' . $dstPath . 'voice.events' .
     $dstPath . 'sound.wav');
 foreach (scandir($dstPath) as $file) {
     if (preg_match('~(\d+).sound.wav~', $file, $m)) {
-        $soundStart = $m[1];
+        $startTime = $m[1];
         break;
     }
 }
-if (empty($soundStart)) {
+if (empty($startTime)) {
     halt('Sound preparation fault. Sound file not found.');
 }
 
@@ -82,8 +84,8 @@ foreach ($presentations as $key => $p) {
     $sources[] = '-i ' . $slide;
     addImageToFilters(
         $filters,
-        ($p['time'] - $soundStart) / 1000,
-        isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        ($p['time'] - $startTime) / 1000,
+        isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2)),
         $key + 2
@@ -115,8 +117,8 @@ foreach ($userEvents as $key => $event) {
     $sources[] = '-i ' . $image;
     addImageToFilters(
         $filters,
-        ($event['time'] - $soundStart) / 1000,
-        isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        ($event['time'] - $startTime) / 1000,
+        isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         $coords['y'],
         $key + 2 + count($presentations)
@@ -133,15 +135,14 @@ $chatEvents = extractCSV($dstPath . 'chat.events', [0 => 'time', 1 => 'user', 2 
 writeLn('...preparing chat-list images');
 $chatList = [];
 $coords = $contents['ChatWindow'];
-$events = new \ProfIT\Bbb\EventsFile($srcPath . 'events.xml');
 /** Chat caption from start */
-$image = $dstPath . 'chat' . DS . 'list.' . $soundStart . '.png';
+$image = $dstPath . 'chat' . DS . 'list.' . $startTime . '.png';
 generateChatListImage($image, $coords, $chatList, $events);
 $sources[] = '-i ' . $image;
 addImageToFilters(
     $filters,
     0,
-    isset($chatEvents[0]) ? (($chatEvents[0]['time'] - $soundStart) / 1000) : '100000',
+    isset($chatEvents[0]) ? (($chatEvents[0]['time'] - $startTime) / 1000) : '100000',
     $coords['x'],
     $coords['y'],
     2 + count($presentations) + $userImagesCount
@@ -153,8 +154,8 @@ foreach ($chatEvents as $key => $event) {
     $sources[] = '-i ' . $image;
     addImageToFilters(
         $filters,
-        ($event['time'] - $soundStart) / 1000,
-        isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $soundStart) / 1000) : '100000',
+        ($event['time'] - $startTime) / 1000,
+        isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         $coords['y'],
         $key + 3 + count($presentations) + $userImagesCount
@@ -164,7 +165,7 @@ foreach ($chatEvents as $key => $event) {
 /** Combine video */
 writeLn('...combining video');
 
-exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $soundStart . '.sound.wav -loop 1 -i ' .
+exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $startTime . '.sound.wav -loop 1 -i ' .
     $dstPath . 'layout.png ' . implode(' ', $sources) . ' -filter_complex "' . implode(';', $filters) .
     '" -map "[out]" -map 0:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
     '-shortest ' . $dstPath . 'video_presentation.avi');
