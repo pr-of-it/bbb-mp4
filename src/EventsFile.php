@@ -63,21 +63,19 @@ class EventsFile
     }
 
     /**
-     * @param string $eventName - название события для поиска
-     * 
-     * @return string|null - отметка времени или null
+     * @return mixed|null - значение или null
+     *
+     * @param string $pattern
      *
      * @throws \ProfIT\Bbb\Exception
      */
-    public function findFirstTimestamp($eventName = null) {
+    public function findValueByPattern(string $pattern) {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
             throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
 
         while (false !== $line = fgets($src, 10240)) {
-            $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
-            $pattern = '~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U';
             if (preg_match($pattern, $line, $m)) {
                 $timestamp = $m[1];
                 fclose($src);
@@ -90,51 +88,27 @@ class EventsFile
     }
 
     /**
+     * @param string $eventName - название события для поиска
+     * 
      * @return string|null - отметка времени или null
-     *
-     * @throws \ProfIT\Bbb\Exception
+     */
+    public function findFirstTimestamp($eventName = null) {
+        $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
+        return $this->findValueByPattern('~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U');
+    }
+
+    /**
+     * @return string|null - отметка времени или null
      */
     public function findRealFirstTimestamp() {
-        $src = fopen($this->eventsFileName, 'r');
-        if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
-        }
-
-        while (false !== $line = fgets($src, 10240)) {
-            $pattern = '~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U';
-            if (preg_match($pattern, $line, $m)) {
-                $timestamp = $m[1];
-                fclose($src);
-                return $timestamp;
-            }
-        }
-
-        fclose($src);
-        return null;
+        return $this->findValueByPattern('~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U');
     }
 
 
     /**
      * @return string|null - название мероприятия или null
-     *
-     * @throws \ProfIT\Bbb\Exception
      */
     public function findMeetingName() {
-        $src = fopen($this->eventsFileName, 'r');
-        if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
-        }
-
-        while (false !== $line = fgets($src, 10240)) {
-            $pattern = '~<metadata.+meetingName="(.+)".+>~U';
-            if (preg_match($pattern, $line, $m)) {
-                $name = $m[1];
-                fclose($src);
-                return $name;
-            }
-        }
-
-        fclose($src);
-        return null;
+        return $this->findValueByPattern('~<metadata.+meetingName="(.+)".+>~U');
     }
 }
