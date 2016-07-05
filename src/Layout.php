@@ -104,8 +104,6 @@ class Layout
 
     public function addChatListWindow(array $params, array $list, EventsFile $events)
     {
-        $firstTimestamp = $events->findFirstTimestamp();
-        $realFirstTimestamp = $events->findRealFirstTimestamp();
         $meetingName = $events->findMeetingName();
         $listWindow = new Window($this->styles, [
             'x'      => (int) round(((float)$params['x']) * $this->width),
@@ -116,7 +114,7 @@ class Layout
         ]);
         $listWindow->createChatListCaption($meetingName);
         foreach ($list as $item) {
-            $listWindow->createChatMessageCaption($item['user'], date('H:i', ($realFirstTimestamp + ($item['time'] - $firstTimestamp)/1000)));
+            $listWindow->createChatMessageCaption($item['user'], $events->getAbsoluteTime($item['time'])->format('H:i'));
             $listWindow->createChatMessage($item['message']);
         }
         $this->windows[] = $listWindow;

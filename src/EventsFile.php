@@ -111,4 +111,18 @@ class EventsFile
     public function findMeetingName() {
         return $this->findValueByPattern('~<metadata.+meetingName="(.+)".+>~U');
     }
+
+    /**
+     * @param double $timestamp - относительная отметка времени
+     *
+     * @return \DateTime - объект абсолютного времени
+     */
+    public function getAbsoluteTime($timestamp) {
+        $firstTimestamp = $this->findFirstTimestamp();
+        $realFirstTimestamp = $this->findRealFirstTimestamp();
+        
+        $time = new \DateTime('@' . ($realFirstTimestamp + round(($timestamp - $firstTimestamp)/1000)));
+        $time->setTimezone(new \DateTimeZone('Europe/Moscow'));
+        return $time;
+    }
 }
