@@ -18,7 +18,7 @@ function generateListImage(string $dst, array $coords, array $list)
 
     $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
     $layout->setDimensions($coords['w'], $coords['h'], 0);
-    $layout->addListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'pad' => 5], $list);
+    $layout->addListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
     $layout->generatePng($dst, true, false);
 }
 
@@ -40,7 +40,7 @@ function generateChatListImage(string $dst, array $coords, array $list, \ProfIT\
 
     $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
     $layout->setDimensions($coords['w'], $coords['h'], 0);
-    $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'pad' => 5], $list, $events);
+    $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list, $events);
     $layout->generatePng($dst, true, false);
 }
 
