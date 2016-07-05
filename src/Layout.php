@@ -97,7 +97,7 @@ class Layout
             'pad'    => $this->pad,
         ]);
         foreach ($list as $text) {
-            $listWindow->createTextRow($text);
+            $listWindow->createUserListRow($text);
         }
         $this->windows[] = $listWindow;
     }
@@ -114,10 +114,10 @@ class Layout
             'h'      => (int) round(((float)$params['h']) * $this->height),
             'pad'    => $this->pad,
         ]);
-        $listWindow->createTextRow('Добро пожаловать в ' . $meetingName, true);
+        $listWindow->createChatListCaption($meetingName);
         foreach ($list as $item) {
-            $listWindow->createMessageCaption($item['user'], date('H:i', ($realFirstTimestamp + ($item['time'] - $firstTimestamp)/1000)));
-            $listWindow->createTextRow($item['message']);
+            $listWindow->createChatMessageCaption($item['user'], date('H:i', ($realFirstTimestamp + ($item['time'] - $firstTimestamp)/1000)));
+            $listWindow->createChatMessage($item['message']);
         }
         $this->windows[] = $listWindow;
     }
