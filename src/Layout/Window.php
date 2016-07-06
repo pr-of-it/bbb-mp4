@@ -57,19 +57,40 @@ class Window
         ];
     }
     
-    public function createTextRow(string $text) {
-        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => 5]), $text);
+    public function createTextRow(string $text, $pad = 0, string $color = null, bool $bold = false) {
+        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => $pad]), $text, $color, $bold);
         $this->addChild($textRow);
         $textContentHeight = $textRow->h + $this->pad;
         $this->addOffset('top', $textContentHeight);
 
         $textOverflow = $textRow->cutTextToWidth();
         if (false !== $textOverflow) {
-            $this->createTextRow($textOverflow);
+            $this->createTextRow($textOverflow, $pad, $color, $bold);
         }
         if ($this->offset['top'] > $this->h) {
             $this->yCorrection -= $textContentHeight;
             $this->h += $textContentHeight;
         }
+        return $textRow;
+    }
+
+    public function createUserListRow(string $userName) {
+        $this->createTextRow($userName, 2 * TextRow::TEXT_LEFT_OFFSET);
+    }
+
+    public function createChatListCaption(string $meetingName) {
+        $this->createTextRow('Добро пожаловать в ' . $meetingName, TextRow::TEXT_LEFT_OFFSET, '#1672ba', true);
+        $this->createTextRow('');
+    }
+
+    public function createChatMessageCaption(string $user, string $time) {
+        $textRow = $this->createTextRow($user, TextRow::TEXT_LEFT_OFFSET, $this->styles->rules['.quickWindowLinkStyle']['selectionColor']);
+        $this->offset['top'] -= $textRow->h;
+        $textRow = $this->createTextRow($time, TextRow::TEXT_LEFT_OFFSET, $this->styles->rules['.quickWindowLinkStyle']['selectionColor']);
+        $textRow->alignRight();
+    }
+
+    public function createChatMessage(string $text) {
+        $this->createTextRow($text, 2 * TextRow::TEXT_LEFT_OFFSET);
     }
 }

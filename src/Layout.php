@@ -97,7 +97,25 @@ class Layout
             'pad'    => $this->pad,
         ]);
         foreach ($list as $text) {
-            $listWindow->createTextRow($text);
+            $listWindow->createUserListRow($text);
+        }
+        $this->windows[] = $listWindow;
+    }
+
+    public function addChatListWindow(array $params, array $list, EventsFile $events)
+    {
+        $meetingName = $events->findMeetingName();
+        $listWindow = new Window($this->styles, [
+            'x'      => (int) round(((float)$params['x']) * $this->width),
+            'y'      => (int) round(((float)$params['y']) * $this->height),
+            'w'      => (int) round(((float)$params['w']) * $this->width),
+            'h'      => (int) round(((float)$params['h']) * $this->height),
+            'pad'    => $this->pad,
+        ]);
+        $listWindow->createChatListCaption($meetingName);
+        foreach ($list as $item) {
+            $listWindow->createChatMessageCaption($item['user'], $events->getAbsoluteTime($item['time'])->format('H:i'));
+            $listWindow->createChatMessage($item['message']);
         }
         $this->windows[] = $listWindow;
     }

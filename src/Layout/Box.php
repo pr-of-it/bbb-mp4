@@ -74,7 +74,7 @@ class Box
         }
     }
     
-    public function renderText($canvas, string $text)
+    public function renderText($canvas, string $text, bool $bold = false)
     {
         $textHeight = $this->fontSize;
         $offsetY = floor(($this->h - $textHeight) / 2);
@@ -84,6 +84,9 @@ class Box
         $y = $this->y + $yCorrection + $this->fontSize + $offsetY;
 
         imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
+        if (true === $bold) {
+            imagettftext($canvas, $textHeight, 0, $x+1, $y+1, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
+        }
     }
 
     public function addChild(Box $child)

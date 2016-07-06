@@ -63,21 +63,19 @@ class EventsFile
     }
 
     /**
-     * @param string $eventName - название события для поиска
-     * 
-     * @return string|null - отметка времени или null
+     * @return mixed|null - значение или null
+     *
+     * @param string $pattern
      *
      * @throws \ProfIT\Bbb\Exception
      */
-    public function findFirstTimestamp($eventName = null) {
+    public function findValueByPattern(string $pattern) {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
             throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
         }
 
         while (false !== $line = fgets($src, 10240)) {
-            $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
-            $pattern = '~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U';
             if (preg_match($pattern, $line, $m)) {
                 $timestamp = $m[1];
                 fclose($src);
@@ -88,5 +86,43 @@ class EventsFile
         fclose($src);
         return null;
     }
-    
+
+    /**
+     * @param string $eventName - название события для поиска
+     * 
+     * @return string|null - отметка времени или null
+     */
+    public function findFirstTimestamp($eventName = null) {
+        $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
+        return $this->findValueByPattern('~<event\s+timestamp="(\d+)".+' .$eventPart . '>~U');
+    }
+
+    /**
+     * @return string|null - отметка времени или null
+     */
+    public function findRealFirstTimestamp() {
+        return $this->findValueByPattern('~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U');
+    }
+
+
+    /**
+     * @return string|null - название мероприятия или null
+     */
+    public function findMeetingName() {
+        return $this->findValueByPattern('~<metadata.+meetingName="(.+)".+>~U');
+    }
+
+    /**
+     * @param double $timestamp - относительная отметка времени
+     *
+     * @return \DateTime - объект абсолютного времени
+     */
+    public function getAbsoluteTime($timestamp) {
+        $firstTimestamp = $this->findFirstTimestamp();
+        $realFirstTimestamp = $this->findRealFirstTimestamp();
+        
+        $time = new \DateTime('@' . ($realFirstTimestamp + round(($timestamp - $firstTimestamp)/1000)));
+        $time->setTimezone(new \DateTimeZone('Europe/Moscow'));
+        return $time;
+    }
 }
