@@ -52,6 +52,11 @@ BigBlueButton Record Process
 Считывает события чата из файла events.xml. Создает новый файл events.new.xml без них.
 События чата выводятся в stdout как CSV "timestamp,user,message".
 
+## extractDeskshareEvents
+    php extractDeskshareEvents.php --src=events.xml > voice.events
+
+Считывает события трансляции рабочего стола из файла events.xml и выводит их в stdout как CSV "started/stopped,timestamp,file".
+
 # Окна (они же области экрана)
 ## NotesWindow
 ## BroadcastWindow
