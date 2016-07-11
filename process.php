@@ -197,7 +197,7 @@ foreach($deskshareEventsSource as $event) {
     }
 }
 foreach($deskshareEvents as $key => $event) {
-    $sources[] = '-i ' . $event['source'];
+    $sources[] = '-itsoffset ' . $event['start'] . ' -i ' . $event['source'];
     $filterKey = $key + 3 + count($presentations) + $userImagesCount + count($chatEvents);
     $filterScale = '[' . $filterKey . ':v] scale=' . $coords['w'] . ':' . $coords['h'] . ' [' . $filterKey . 's]';
     $filterOverflow = '[out]' . '[' . $filterKey . 's]' .
