@@ -19,13 +19,13 @@ $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayo
 $layout->setDimensions($width, $height, $pad);
 $layout->addCustomWindow([
     'name' => 'Deskshare',
-    'x' => 0.1,
-    'y' => 0.1,
-    'w' => 0.8,
-    'h' => 0.8,
+    'x' => 0,
+    'y' => 0,
+    'w' => 1,
+    'h' => 1,
 ]);
 $layout->setMarkedWindows(['Deskshare']);
-$layout->generatePng($dstFileName, $fillContent, true, true);
+$layout->generatePng($dstFileName, $fillContent, true);
 
 foreach ($layout->getWindows() as $window) {
     /** @var \ProfIT\Bbb\Layout\Window $window */

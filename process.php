@@ -88,7 +88,7 @@ foreach ($presentations as $key => $p) {
         isset($presentations[$key + 1]) ? (($presentations[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         round($coords['y'] + (($coords['h'] - $slideSize[1]) / 2)),
-        $key + 3
+        $key + 2
     );
 }
 
@@ -121,7 +121,7 @@ foreach ($userEvents as $key => $event) {
         isset($userEvents[$key + 1]) ? (($userEvents[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         $coords['y'],
-        $key + 3 + count($presentations)
+        $key + 2 + count($presentations)
     );
 }
 
@@ -145,7 +145,7 @@ addImageToFilters(
     isset($chatEvents[0]) ? (($chatEvents[0]['time'] - $startTime) / 1000) : '100000',
     $coords['x'],
     $coords['y'],
-    3 + count($presentations) + $userImagesCount
+    2 + count($presentations) + $userImagesCount
 );
 foreach ($chatEvents as $key => $event) {
     $chatList[] = $event;
@@ -158,17 +158,22 @@ foreach ($chatEvents as $key => $event) {
         isset($chatEvents[$key + 1]) ? (($chatEvents[$key + 1]['time'] - $startTime) / 1000) : '100000',
         $coords['x'],
         $coords['y'],
-        $key + 4 + count($presentations) + $userImagesCount
+        $key + 3 + count($presentations) + $userImagesCount
     );
 }
 
 /** Prepare deskshare layout and content coordinates */
 writeLn('...preparing deskshare layout');
-execute('php makeDeskshareLayout.php --width=' . $width . ' --height=' . $height .
-    ' --dst=' . $dstPath . 'deskshare.png --pad=10 --fill-content-zone',
+
+$dsOffsetX = round($width * 0.1);
+$dsOffsetY = round($height * 0.1);
+$dsWidth = round($width * 0.8);
+$dsHeight = round($height * 0.8);
+execute('php makeDeskshareLayout.php --width=' . $dsWidth . ' --height=' . $dsHeight .
+    ' --dst=' . $dstPath . 'deskshare.png --pad=10',
     $dstPath . 'deskshare.coords');
 
-$contents = extractCSV($dstPath . 'deskshare.coords', [0 => 'window', 1 => 'xw', 2 => 'yw', 5 => 'x', 6 => 'y', 7 => 'w', 8 => 'h']);
+$contents = extractCSV($dstPath . 'deskshare.coords', [0 => 'window', 5 => 'x', 6 => 'y', 7 => 'w', 8 => 'h']);
 $contents = array_column($contents, null, 'window');
 $coords = $contents['Deskshare'];
 
@@ -197,19 +202,23 @@ foreach($deskshareEventsSource as $event) {
     }
 }
 foreach($deskshareEvents as $key => $event) {
+    $sources[] = '-loop 1 -i ' . $dstPath . 'deskshare.png';
     $sources[] = '-itsoffset ' . $event['start'] . ' -i ' . $event['source'];
-    $filterKey = $key + 3 + count($presentations) + $userImagesCount + count($chatEvents);
+    $filterKey = 2 * $key + 2 + count($presentations) + $userImagesCount + count($chatEvents);
+    $filterLayout = '[out]' . '[' . ($filterKey - 1) . ':v]' .
+        ' overlay=' . $dsOffsetX . ':' . $dsOffsetY . ':enable=\'between(t,' .
+        $event['start'] . ',' . $event['end'] . ')\' [out]';
     $filterScale = '[' . $filterKey . ':v] scale=' . $coords['w'] . ':' . $coords['h'] . ' [' . $filterKey . 's]';
     $filterOverflow = '[out]' . '[' . $filterKey . 's]' .
-        ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
+        ' overlay=' . ($dsOffsetX + $coords['x']) . ':' . ($dsOffsetY + $coords['y']) . ':enable=\'between(t,' .
         $event['start'] . ',' . $event['end'] . ')\' [out]';
-    $filters[] = $filterScale . '; ' . $filterOverflow;
+    $filters[] = $filterLayout . ';' . $filterScale . '; ' . $filterOverflow;
 }
 /** Combine video */
 writeLn('...combining video');
 
 exec('ffmpeg -loglevel quiet -stats -y -i ' . $dstPath . $startTime . '.sound.wav -loop 1 -i ' .
-    $dstPath . 'layout.png -loop 1 -i ' . $dstPath . 'deskshare.png ' . implode(' ', $sources) .
+    $dstPath . 'layout.png ' . implode(' ', $sources) .
     ' -filter_complex "' . implode(';', $filters) .
     '" -map "[out]" -map 0:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
     '-shortest ' . $dstPath . 'video.avi');
