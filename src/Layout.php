@@ -75,10 +75,8 @@ class Layout
         $this->windows = $windows;
     }
 
-    public function addCustomWindow(array $params)
-    {
-        $this->windows[] = new Window($this->styles, [
-            'name'   => $params['name'],
+    protected function createWindowWithParams(array $params) {
+        return new Window($this->styles, [
             'x'      => (int) round(((float)$params['x']) * $this->width),
             'y'      => (int) round(((float)$params['y']) * $this->height),
             'w'      => (int) round(((float)$params['w']) * $this->width),
@@ -86,16 +84,17 @@ class Layout
             'pad'    => $this->pad,
         ]);
     }
+    
+    public function addCustomWindow(array $params)
+    {
+        $customWindow = $this->createWindowWithParams($params);
+        $customWindow->name = $params['name'];
+        $this->windows[] = $customWindow;
+    }
 
     public function addListWindow(array $params, array $list)
     {
-        $listWindow = new Window($this->styles, [
-            'x'      => (int) round(((float)$params['x']) * $this->width),
-            'y'      => (int) round(((float)$params['y']) * $this->height),
-            'w'      => (int) round(((float)$params['w']) * $this->width),
-            'h'      => (int) round(((float)$params['h']) * $this->height),
-            'pad'    => $this->pad,
-        ]);
+        $listWindow = $this->createWindowWithParams($params);
         foreach ($list as $text) {
             $listWindow->createUserListRow($text);
         }
@@ -105,13 +104,7 @@ class Layout
     public function addChatListWindow(array $params, array $list, EventsFile $events)
     {
         $meetingName = $events->findMeetingName();
-        $listWindow = new Window($this->styles, [
-            'x'      => (int) round(((float)$params['x']) * $this->width),
-            'y'      => (int) round(((float)$params['y']) * $this->height),
-            'w'      => (int) round(((float)$params['w']) * $this->width),
-            'h'      => (int) round(((float)$params['h']) * $this->height),
-            'pad'    => $this->pad,
-        ]);
+        $listWindow = $this->createWindowWithParams($params);
         $listWindow->createChatListCaption($meetingName);
         foreach ($list as $item) {
             $listWindow->createChatMessageCaption($item['user'], $events->getAbsoluteTime($item['time'])->format('H:i'));
