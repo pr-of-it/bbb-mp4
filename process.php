@@ -199,7 +199,7 @@ foreach($deskshareEvents as $key => $event) {
         ' --pad=10', $dstPath . 'deskshare.coords');
     $coords = extractCSV($dstPath . 'deskshare.coords', [1 => 'lx', 2 => 'ly', 5 => 'x', 6 => 'y', 7 => 'w', 8 => 'h', 9 => 'resize'])[0];
 
-    $sources[] = '-itsoffset ' . $event['start'] . ' -loop 1 -i ' . $deskshareImage;
+    $sources[] = '-i ' . $deskshareImage;
     $filterLayout = '[out]' . '[' . (count($sources) - 1) . ':v]' .
         ' overlay=' . $coords['lx'] . ':' . $coords['ly'] . ':enable=\'between(t,' .
         $event['start'] . ',' . $event['end'] . ')\' [out]';
@@ -208,10 +208,13 @@ foreach($deskshareEvents as $key => $event) {
         $filterScale = '[' . (count($sources) - 1) . ':v] scale=' .
             $coords['w'] . ':-1 [' . (count($sources) - 1) . 's]';
     }
-    $filterOverflow = '[out]' . '[' . (count($sources) - 1) . (isset($filterScale) ? 's' : 'v') . ']' .
+    $filterOverflowTrim = '[' . (count($sources) - 1) . (isset($filterScale) ? 's' : 'v') .
+        '] trim=duration=' . ($event['end'] - $event['start']) . ' [' . (count($sources) - 1) . 't]';
+    $filterOverflow = '[out]' . '[' . (count($sources) - 1) . 't]' .
         ' overlay=' . $coords['x'] . ':' . $coords['y'] . ':enable=\'between(t,' .
         $event['start'] . ',' . $event['end'] . ')\' [out]';
-    $filters[] = $filterLayout . ';' . (isset($filterScale) ? ($filterScale . ';') : '') . $filterOverflow;
+    $filters[] = $filterLayout . ';' . (isset($filterScale) ? ($filterScale . ';') : '') .
+        $filterOverflowTrim . ';' . $filterOverflow;
 }
 
 /** Combine video */
