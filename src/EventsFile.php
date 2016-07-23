@@ -104,12 +104,18 @@ class EventsFile
         return $this->findValueByPattern('~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U');
     }
 
-
     /**
      * @return string|null - название мероприятия или null
      */
     public function findMeetingName() {
         return $this->findValueByPattern('~<metadata.+meetingName="(.+)".+>~U');
+    }
+
+    /**
+     * @return string|null - id мероприятия или null
+     */
+    public function findMeetingId() {
+        return $this->findValueByPattern('~<recording.+meeting_id="(.+)".+>~U');
     }
 
     /**

@@ -166,8 +166,48 @@ foreach ($chatEvents as $key => $event) {
     );
 }
 
-/** Prepare deskshare layout and content coordinates */
-writeLn('...preparing deskshare layout');
+/** Prepare webcam events */
+writeLn('...preparing webcam events');
+execute('php extractWebcamEvents.php --src=' . $srcPath . 'events.xml',
+    $dstPath . 'webcam.events');
+
+/** Prepare webcam filters */
+writeLn('...preparing webcam filters');
+$webcamEventsSource = extractCSV($dstPath . 'webcam.events', [0 => 'action', 1 => 'time', 2 => 'file']);
+$meetingId = $events->findMeetingId();
+if (null === $meetingId) {
+    halt('Meeting ID not found');
+}
+$coords = $contents['VideoDock'];
+
+$webcamEvents = [];
+foreach($webcamEventsSource as $event) {
+    if ('start' === $event['action']) {
+        $webcamEvents[$event['file']] = [
+            'start' => ($event['time'] - $startTime) / 1000,
+            'end' => '100000',
+            'source' => $srcPath . 'video' . DS . $meetingId . DS . $event['file'] . '.flv',
+        ];
+    } elseif ('stop' === $event['action']) {
+        $webcamEvents[$event['file']]['end'] = ($event['time'] - $startTime) / 1000;
+    }
+}
+foreach($webcamEvents as $key => $event) {
+    $sources[] = '-itsoffset ' . $event['start'] . ' -i ' . $event['source'];
+    $sourceResizedDimensions = getVideoResizedDimensions($event['source'], $coords['w'], $coords['h']);
+    $sourceWidth = $sourceResizedDimensions['width'];
+    $sourceHeight = (false === $sourceResizedDimensions['resize']) ? '-1' : $sourceResizedDimensions['height'];
+    $coordX = round($coords['x'] + ($coords['w'] - $sourceResizedDimensions['width']) / 2);
+    $coordY = round($coords['y'] + ($coords['h'] - $sourceResizedDimensions['height']) / 2);
+    $filterScale = '[' . (count($sources) - 1) . ':v] scale=' .
+        $sourceWidth . ':' . $sourceHeight . ' [' . (count($sources) - 1) . 's]';
+    $filterOverflowTrim = '[' . (count($sources) - 1) . 's] ' .
+        'trim=duration=' . ($event['end'] - $event['start']) . ' [' . (count($sources) - 1) . 't]';
+    $filterOverflow = '[out]' . '[' . (count($sources) - 1) . 't]' .
+        ' overlay=' . $coordX . ':' . $coordY . ':enable=\'between(t,' .
+        $event['start'] . ',' . $event['end'] . ')\' [out]';
+    $filters[] = $filterScale . ';' . $filterOverflowTrim . ';' . $filterOverflow;
+}
 
 /** Prepare deskshare events */
 writeLn('...preparing deskshare events');

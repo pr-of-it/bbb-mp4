@@ -16,7 +16,7 @@ $dstFileName = isset($options['dst']) ? (realpath(dirname($options['dst'])) . DS
 $css = new \ProfIT\Bbb\Layout\StyleSheet(__DIR__ . '/resources/style/css/BBBDefault.css');
 $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);
 $layout->setDimensions($width, $height, $pad);
-$layout->setUnfilledWindows(['PresentationWindow']);
+$layout->setUnfilledWindows(['PresentationWindow', 'VideoDock']);
 $layout->generatePng($dstFileName, $fillContent);
 
 foreach ($layout->getWindows() as $window) {

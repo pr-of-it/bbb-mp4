@@ -4,6 +4,7 @@
  */
 
 require __DIR__ . '/autoload.php';
+require __DIR__ . '/imageFunctions.php';
 
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -26,23 +27,17 @@ $titleHeight = (int)$css->rules['.videoViewStyleNoFocus']['headerHeight'];
 $contentWidth = $width - 2 * $pad;
 $contentHeight = $height - $titleHeight - 3 * $pad;
 
-exec('ffprobe -v quiet -i ' . $srcFileName . ' -show_entries stream=width,height -of csv=p=0', $output);
-$output = explode(',', $output[0]);
-$videoWidth = (int)$output[0];
-$videoHeight = (int)$output[1];
-$resize = false;
+$videoResizedDimensions = getVideoResizedDimensions($srcFileName, $contentWidth, $contentHeight);
+$videoWidth = $videoResizedDimensions['width'];
+$videoHeight = $videoResizedDimensions['height'];
+$videoResized = $videoResizedDimensions['resize'];
 
-while ($videoWidth > $contentWidth || $videoHeight > $contentHeight) {
-    $resize = true;
-    $videoWidth = round($videoWidth * 0.9);
-    $videoHeight = round($videoHeight * 0.9);
-}
 $layoutParams = [
     'w' => $videoWidth + 2 * $pad,
     'h' => $videoHeight + $titleHeight + 3 * $pad,
     'x' => round(($width - ($videoWidth + 2 * $pad)) / 2),
     'y' => round(($height - ($videoHeight + $titleHeight + 3 * $pad)) / 2),
-    'resize' => $resize,
+    'resize' => $videoResized,
 ];
 
 $layout = new \ProfIT\Bbb\Layout(__DIR__ . '/resources/layout.xml', 'defaultlayout', $css);

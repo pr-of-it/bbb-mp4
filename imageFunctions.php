@@ -60,3 +60,50 @@ function addImageToFilters(&$filters, $start, $end, $coordX, $coordY, $num)
         ' overlay=' . $coordX . ':' . $coordY . ':enable=\'between(t,' .
         $start . ',' . $end . ')\' [out]';
 }
+
+/**
+ * Get video picture dimensions
+ *
+ * @param string $fileName
+ *
+ * @return array 
+ */
+function getVideoPictureDimensions(string $fileName)
+{
+    exec('ffprobe -v quiet -i ' . $fileName . ' -show_entries stream=width,height -of csv=p=0', $output);
+    $dimensions = explode(',', $output[0]);
+    
+    return [
+        'width' => (int)$dimensions[0],
+        'height' => (int)$dimensions[1],
+    ];
+}
+
+/**
+ * Get video resized dimensions
+ *
+ * @param string $fileName
+ * @param int $width
+ * @param int $height
+ *
+ * @return array
+ */
+function getVideoResizedDimensions(string $fileName, int $width, int $height)
+{
+    $videoPictureDimensions = getVideoPictureDimensions($fileName);
+    $videoWidth = $videoPictureDimensions['width'];
+    $videoHeight = $videoPictureDimensions['height'];
+    $resize = false;
+
+    while ($videoWidth > $width || $videoHeight > $height) {
+        $resize = true;
+        $videoWidth = round($videoWidth * 0.9);
+        $videoHeight = round($videoHeight * 0.9);
+    }
+
+    return [
+        'width' => $videoWidth,
+        'height' => $videoHeight,
+        'resize' => $resize,
+    ];
+}
