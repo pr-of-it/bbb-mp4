@@ -1,23 +1,32 @@
 <?php
 
-namespace ProfIT\Bbb;
+namespace ProfIT\Bbb\Layout;
 
-use ProfIT\Bbb\Layout\Box;
-use ProfIT\Bbb\Layout\StyleSheet;
-use ProfIT\Bbb\Layout\Window;
+use ProfIT\Bbb\Events\ChatEvent;
+use ProfIT\Bbb\Events;
+use Running\Core\Collection;
+use Running\Core\Std;
 
 class Layout
 {
     protected $data;
+
+    /** @var StyleSheet */
     protected $styles;
 
+    /** @var  int */
     protected $width;
+    /** @var  int */
     protected $height;
+    /** @var  int */
     protected $pad;
 
+    /** @var Window[] */
     protected $windows = [];
-    protected $markedWindows = [];
-    protected $unfilledWindows = [];
+    /** @var string[] */
+    protected $markedWindowsNames = [];
+    /** @var string[] */
+    protected $unfilledWindowsNames = [];
 
     public function __construct(string $filename, string $name, StyleSheet $styles)
     {
@@ -37,6 +46,13 @@ class Layout
         $this->data = $data[0];
     }
 
+    /**
+     * Set layout main window dimensions.
+     *
+     * @param int $width
+     * @param int $height
+     * @param int $pad
+     */
     public function setDimensions(int $width, int $height, int $pad)
     {
         $this->width = $width;
@@ -46,6 +62,10 @@ class Layout
         $this->makeWindows();
     }
 
+    /**
+     * Create inner windows.
+     * Based on self XML data.
+     */
     protected function makeWindows()
     {
         $windows = [];
@@ -61,7 +81,7 @@ class Layout
                 continue;
             }
 
-            $windows[] = new Window($this->styles, [
+            $windows[] = new Window($this->styles, new Std([
                 'name'   => (string)$attributes->name,
                 'x'      => (int) round(((float)$attributes->x) * $this->width),
                 'y'      => (int) round(((float)$attributes->y) * $this->height),
@@ -69,22 +89,35 @@ class Layout
                 'h'      => (int) round(((float)$attributes->height) * $this->height),
                 'hidden' => $attributes->hidden == true,
                 'pad'    => $this->pad,
-            ]);
+            ]));
         }
 
         $this->windows = $windows;
     }
 
+    /**
+     * Create inner window.
+     * Based on input params.
+     *
+     * @param array $params
+     *
+     * @return Window
+     */
     protected function createWindowWithParams(array $params) {
-        return new Window($this->styles, [
+        return new Window($this->styles, new Std([
             'x'      => (int) round(((float)$params['x']) * $this->width),
             'y'      => (int) round(((float)$params['y']) * $this->height),
             'w'      => (int) round(((float)$params['w']) * $this->width),
             'h'      => (int) round(((float)$params['h']) * $this->height),
             'pad'    => $this->pad,
-        ]);
+        ]));
     }
-    
+
+    /**
+     * Add custom window, based on input params, to object's windows property.
+     *
+     * @param array $params
+     */
     public function addCustomWindow(array $params)
     {
         $customWindow = $this->createWindowWithParams($params);
@@ -92,6 +125,12 @@ class Layout
         $this->windows[] = $customWindow;
     }
 
+    /**
+     * Add window, containing list of texts, to object's windows property.
+     *
+     * @param array $params
+     * @param string[] $list
+     */
     public function addListWindow(array $params, array $list)
     {
         $listWindow = $this->createWindowWithParams($params);
@@ -101,37 +140,91 @@ class Layout
         $this->windows[] = $listWindow;
     }
 
-    public function addChatListWindow(array $params, array $list, EventsFile $events)
+    /**
+     * Add window, containing list of chat texts, to object's windows property.
+     *
+     * @param array $params
+     * @param Collection|ChatEvent[] $messages
+     * @param \ProfIT\Bbb\Events $events
+     */
+    public function addChatListWindow(array $params, Collection $messages, Events $events)
     {
         $meetingName = $events->findMeetingName();
         $listWindow = $this->createWindowWithParams($params);
         $listWindow->createChatListCaption($meetingName);
-        foreach ($list as $item) {
-            $listWindow->createChatMessageCaption($item['user'], $events->getAbsoluteTime($item['time'])->format('H:i'));
-            $listWindow->createChatMessage($item['message']);
+        foreach ($messages as $item) {
+            $listWindow->createChatMessageCaption($item->user, $events->getAbsoluteTime($item->time)->format('H:i'));
+            $listWindow->createChatMessage($item->message);
         }
         $this->windows[] = $listWindow;
     }
 
+    /**
+     * Get inner windows objects.
+     *
+     * @return Window[]
+     */
     public function getWindows()
     {
-        if (count($this->markedWindows) > 0) {
+        if (count($this->markedWindowsNames) > 0) {
             return array_filter($this->windows, function (Window $w) {
-                return in_array($w->name, $this->markedWindows);
+                return in_array($w->name, $this->markedWindowsNames);
             });
         } else {
             return $this->windows;
         }
     }
 
+    /**
+     * Get inner window by its name property.
+     *
+     * @param string $name
+     * @throws \Exception
+     *
+     * @return Window
+     */
+    public function getWindowByName(string $name)
+    {
+        foreach ($this->getWindows() as $window) {
+            if ($window->name === $name) {
+                $result = $window;
+                break;
+            }
+        }
+
+        if (empty($result)) {
+            throw new \Exception('Window with name "' . $name . '" not found');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Set names of marked windows for this layout.
+     *
+     * @param string[] $marked
+     */
     public function setMarkedWindows(array $marked) {
-        $this->markedWindows = $marked;
+        $this->markedWindowsNames = $marked;
     }
 
+    /**
+     * Set names of unfilled windows for this layout.
+     *
+     * @param string[] $unfilled
+     */
     public function setUnfilledWindows(array $unfilled) {
-        $this->unfilledWindows = $unfilled;
+        $this->unfilledWindowsNames = $unfilled;
     }
 
+    /**
+     * Generate image in PNG format for this layout.
+     *
+     * @param $dstFileName
+     * @param bool $fillContent
+     * @param bool $drawTitle
+     * @param bool $bgTransparent
+     */
     public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
@@ -145,8 +238,7 @@ class Layout
         }
 
         foreach ($this->windows as $window) {
-            /** @var Window $window */
-            if (count($this->markedWindows) > 0 && false === in_array($window->name, $this->markedWindows)) {
+            if (count($this->markedWindowsNames) > 0 && false === in_array($window->name, $this->markedWindowsNames)) {
                 continue;
             }
 
@@ -154,7 +246,7 @@ class Layout
                 $window->createTitleBar();
             }
 
-            if (true === $fillContent && false === in_array($window->name, $this->unfilledWindows)) {
+            if (true === $fillContent && false === in_array($window->name, $this->unfilledWindowsNames)) {
                 $window->fillContentBackground();
             }
 

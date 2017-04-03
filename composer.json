@@ -1,0 +1,19 @@
+{
+    "name": "pr-of-it/bbb-mp4",
+    "authors": [
+        {
+            "name": "scorp7mix",
+            "email": "scorp7mix@gmail.com"
+        }
+    ],
+    "require": {
+        "pr-of-it/running-core": "dev-master",
+        "pr-of-it/running-fs": "dev-master",
+        "pr-of-it/running-serialization": "dev-master"
+    },
+    "autoload": {
+        "psr-4" : {
+            "ProfIT\\Bbb\\": "src/"
+        }
+    }
+}

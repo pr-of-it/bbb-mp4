@@ -2,6 +2,8 @@
 
 namespace ProfIT\Bbb\Layout;
 
+use Running\Core\Std;
+
 /**
  * Class Box
  * @package ProfIT\Bbb\Layout
@@ -33,8 +35,9 @@ class Box
         'left'   => 0
     ];
 
-    /** @var Box */
+    /** @var Box|Window */
     public $parent;
+    /** @var array */
     public $children = [];
 
     /** @var bool */
@@ -44,12 +47,12 @@ class Box
     public $styles;
 
     /** default styles */
-    protected $bgColor = self::COLOR_GRAY;
-    protected $bdColor = self::COLOR_BLACK;
+    protected $bgColor   = self::COLOR_GRAY;
+    protected $bdColor   = self::COLOR_BLACK;
     protected $fontColor = self::COLOR_BLACK;
-    protected $fontSize = self::DEFAULT_FONT_SIZE;
+    protected $fontSize  = self::DEFAULT_FONT_SIZE;
 
-    public function __construct(StyleSheet $styles = null, array $props = [])
+    public function __construct(StyleSheet $styles = null, Std $props = null)
     {
         $this->styles = $styles;
 
@@ -62,14 +65,30 @@ class Box
 
     public function render($canvas)
     {
-        if ($this->hidden) return;
+        if ($this->hidden) {
+            return;
+        }
 
         $yCorrection = $this->parent->yCorrection ?? 0;
-        imagefilledrectangle($canvas, $this->x, $this->y + $yCorrection, $this->x + $this->w - 1, $this->y + $yCorrection + $this->h - 1, self::color($canvas, $this->bgColor));
-        imagerectangle($canvas, $this->x, $this->y + $yCorrection, $this->x + $this->w - 1, $this->y + $yCorrection + $this->h - 1, self::color($canvas, $this->bdColor));
+        imagefilledrectangle(
+            $canvas,
+            $this->x,
+            $this->y + $yCorrection,
+            $this->x + $this->w - 1,
+            $this->y + $yCorrection + $this->h - 1,
+            self::color($canvas, $this->bgColor)
+        );
+        imagerectangle(
+            $canvas,
+            $this->x,
+            $this->y + $yCorrection,
+            $this->x + $this->w - 1,
+            $this->y + $yCorrection + $this->h - 1,
+            self::color($canvas, $this->bdColor)
+        );
 
         foreach ($this->children as $child) {
-            /** @var Window $child */
+            /** @var Box $child */
             $child->render($canvas);
         }
     }
@@ -83,9 +102,27 @@ class Box
         $yCorrection = $this->parent->yCorrection ?? 0;
         $y = $this->y + $yCorrection + $this->fontSize + $offsetY;
 
-        imagettftext($canvas, $textHeight, 0, $x, $y, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
+        imagettftext(
+            $canvas,
+            $textHeight,
+            0,
+            $x,
+            $y,
+            self::color($canvas, $this->fontColor),
+            static::FONT_PATH,
+            $text
+        );
         if (true === $bold) {
-            imagettftext($canvas, $textHeight, 0, $x+1, $y+1, self::color($canvas, $this->fontColor), static::FONT_PATH, $text);
+            imagettftext(
+                $canvas,
+                $textHeight,
+                0,
+                $x+1,
+                $y+1,
+                self::color($canvas, $this->fontColor),
+                static::FONT_PATH,
+                $text
+            );
         }
     }
 

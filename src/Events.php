@@ -3,34 +3,43 @@
 namespace ProfIT\Bbb;
 
 /**
- * Class EventsFile
+ * Class Events
  * @package ProfIT\Bbb
  */
-class EventsFile
+class Events
 {
+    use TEventsExtract;
+
     protected $eventsFileName;
 
     /**
-     * @param string $src - полный путь до events.xml
+     * @param string $src - full path to events.xml
+     * @throws \Exception
      */
     public function __construct(string $src)
     {
-        $this->eventsFileName = $src;
+        $srcFileName = realpath($src);
+
+        if (!is_readable($srcFileName)) {
+            throw new \Exception('File does not exist or is not readable');
+        }
+
+        $this->eventsFileName = $srcFileName;
     }
 
     /**
-     * @param $startPattern - регулярное выражение начала блока фрагмента
-     * @param $endPattern - регулярное выражение конца блока фрагмента
-     * @param $dstFileName - путь к файлу для вывода строк, не соответствующих фрагменту
-     * @return \Generator - генератор фрагментов
+     * @param $startPattern - regexp for fragment beginning
+     * @param $endPattern - regexp for fragment end
+     * @param $dstFileName - path to file where not suitable for fragment strings will be saved
+     * @return \Generator - fragment generator
      * 
-     * @throws \ProfIT\Bbb\Exception
+     * @throws \Exception
      */
-    public function extractFragments($startPattern, $endPattern, $dstFileName = null)
+    protected function extractFragments($startPattern, $endPattern, $dstFileName = null)
     {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
+            throw new \Exception ('Error while opening file: ' . $this->eventsFileName);
         }
         
         if (!empty($dstFileName)) {
@@ -63,16 +72,16 @@ class EventsFile
     }
 
     /**
-     * @return mixed|null - значение или null
+     * @return mixed|null
      *
      * @param string $pattern
      *
-     * @throws \ProfIT\Bbb\Exception
+     * @throws \Exception
      */
     public function findValueByPattern(string $pattern) {
         $src = fopen($this->eventsFileName, 'r');
         if (false === $src) {
-            throw new \ProfIT\Bbb\Exception ('Error while opening file: ' . $this->eventsFileName);
+            throw new \Exception ('Error while opening file: ' . $this->eventsFileName);
         }
 
         while (false !== $line = fgets($src, 10240)) {
@@ -88,9 +97,9 @@ class EventsFile
     }
 
     /**
-     * @param string $eventName - название события для поиска
+     * @param string $eventName
      * 
-     * @return string|null - отметка времени или null
+     * @return string|null - timestamp or null
      */
     public function findFirstTimestamp($eventName = null) {
         $eventPart = empty($eventName) ? '' : (' eventname="' . $eventName . '"');
@@ -98,30 +107,30 @@ class EventsFile
     }
 
     /**
-     * @return string|null - отметка времени или null
+     * @return string|null - timestamp or null
      */
     public function findRealFirstTimestamp() {
         return $this->findValueByPattern('~<recording\s+meeting_id=".+\-(\d{10})\d+".+>~U');
     }
 
     /**
-     * @return string|null - название мероприятия или null
+     * @return string|null - meeting name or null
      */
     public function findMeetingName() {
         return $this->findValueByPattern('~<metadata.+meetingName="(.+)".+>~U');
     }
 
     /**
-     * @return string|null - id мероприятия или null
+     * @return string|null - meeting id or null
      */
     public function findMeetingId() {
         return $this->findValueByPattern('~<recording.+meeting_id="(.+)".+>~U');
     }
 
     /**
-     * @param double $timestamp - относительная отметка времени
+     * @param double $timestamp - relative timestamp
      *
-     * @return \DateTime - объект абсолютного времени
+     * @return \DateTime - absolute datetime object
      */
     public function getAbsoluteTime($timestamp) {
         $firstTimestamp = $this->findFirstTimestamp();

@@ -1,71 +1,40 @@
 # bbb-mp4
 BigBlueButton Record Process
 
-# Команды
+# Необходимые зависимости
 
-## extractCursorEvents
-    php extractCursorEvents.php --src=events.xml --dst=events.new.xml > cursor.events
+## \Running\Core
+## \Running\Fs
+## \Running\Serialization
 
-Считывает курсорные события из файла events.xml. Создает новый файл events.new.xml без них. Курсорные же события
-выводятся в stdout как CSV "timestamp,x,y"
+# Конфигурационный файл
+Содержит следующую информацию:
+    
+    'paths' => [
+        'resources'   => __DIR__ . '/resources',
+        'source'      => __DIR__ . '/source',
+        'destination' => __DIR__ . '/result',
+    ],
+Абсолютные пути расположения директории ресурсов BBB, директории с файлами вебинара и директории назначения, в которую будут помещены результаты работы
 
-## generateCursorPng
-    php generateCursorPng.php --src=./cursor.events --dst=./cursor/ --width=1280 --height=720 --diameter=10
+    'video' => [
+        'width'  => 1280,
+        'height' => 720,
+    ],
+Желаемые размеры видео
 
-Создает на базе файла событий курсора в формате CSV последовательность файлов в формате PNG с изображением курсора.
-Задается папка, куда будет сохранена последовательность изображений, их ширина и высота и размер пятна курсора
+    'log' => true
+Нужно ли выводить сообщения, сопровождающие процесс
 
-## extractVoiceEvents
-    php extractVoiceEvents.php --src=events.xml > voice.events
+# Основной класс - \BBB\Process
 
-Считывает голосовые события из файла events.xml и выводит их в stdout как CSV "Start/Stop,timestamp,filename".
 
-## makeSound
-    php makeSound.php --src=voice.events --src-dir=./audio --dst=sound.wav
+## Конструктор
+В качестве аргумента получает объект \Running\Core\Config
 
-Создает на базе файла голосовых событий и фрагментов этих событий итоговый файл. Задается файл, куда нужно
-сохранить результат и опционально путь к папке, где расположены фрагменты. К имени итогового файла будет
-добавлена отметка времени начала первого фрагмента, например: 2419160065.sound.wav.
+    new \BBB\Process($config);
 
-## makeLayout
-    php makeLayout.php --width=1280 --height=720 --dst=test.png > contents.coords
+## Основной метод
 
-Создает изображение фона на базе ресурсов. Задается ширина и высота фона (опционально), путь к файлу, в котором
-будет сохранено изображение. Координаты контента выводятся в stdout как CSV "название окна,x,y,width,height".
-
-## makeDeskshareLayout
-    php php makeDeskshareLayout.php --src=content.coords --dst=deskshare.png
-
-Создает изображение фона для окна трансляции рабочего стола на базе координат, полученных в результате
-выполнения makeLayout. Задается путь к результату работы makeLayout и путь к файлу, в котором будет сохранено
-изображение.
-
-## extractUserEvents
-    php extractUserEvents.php --src=events.xml > user.events
-
-Считывает события, связанные с входом и выходом пользователей в конференецию, из файла events.xml.
-И выводит их в stdout как CSV "left/join,timestamp,userId,name".
-
-## extractChatEvents
-    php extractChatEvents.php --src=events.xml --dst=events.new.xml > chat.events
-
-Считывает события чата из файла events.xml. Создает новый файл events.new.xml без них.
-События чата выводятся в stdout как CSV "timestamp,user,message".
-
-## extractDeskshareEvents
-    php extractDeskshareEvents.php --src=events.xml > voice.events
-
-Считывает события трансляции рабочего стола из файла events.xml и выводит их в stdout как CSV "started/stopped,timestamp,file".
-
-# Окна (они же области экрана)
-## NotesWindow
-## BroadcastWindow
-## PresentationWindow
-Окно показа слайдов
-## VideoDock
-## ChatWindow
-Окно чата
-## UsersWindow
-Список пользователей
-## ViewersWindow
-## ListenersWindow
+    $process->run();
+    

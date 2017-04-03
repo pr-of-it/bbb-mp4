@@ -2,14 +2,14 @@
 
 namespace ProfIT\Bbb\Layout;
 
-use ProfIT\Bbb\Layout;
+use Running\Core\Std;
 
 class TitleBar
     extends Box
 {
     const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
 
-    public function __construct(StyleSheet $styles, array $props = [])
+    public function __construct(StyleSheet $styles, Std $props = null)
     {
         parent::__construct($styles, $props);
 
