@@ -46,10 +46,11 @@ class Process
         $this->config = $config;
         $this->ffmpeg = new FFMpeg();
 
-        $this->src = realpath($config->paths->source) . '/';
+        $this->src = realpath($config->paths->source);
         if (!is_readable($this->src)) {
             $this->error('Source directory does not exist or is not readable');
         }
+        $this->src .= '/';
 
         $this->width = $config->video->width ?? 1280;
         $this->height = $config->video->height ?? 720;
