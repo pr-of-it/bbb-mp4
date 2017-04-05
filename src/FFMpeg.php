@@ -75,7 +75,7 @@ class FFMpeg
         file_put_contents($sourcesFile, implode(' ' . PHP_EOL, $this->sources->toArray()));
         file_put_contents($filtersFile, implode(';' . PHP_EOL, $this->filters->toArray()));
 
-        exec('ffmpeg.exe -v quiet' . ($showStats ? ' -stats' : '') . ' -y ' . implode(' ', $this->sources->toArray()) .
+        exec('ffmpeg -v quiet' . ($showStats ? ' -stats' : '') . ' -y ' . implode(' ', $this->sources->toArray()) .
             ' -filter_complex_script "' . $filtersFile .
             '" -map "[out]" -map 0:0 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a copy ' .
             '-shortest ' . $dst . $filename . '.avi');
