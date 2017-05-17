@@ -8,8 +8,8 @@ use ProfIT\Bbb\Events\PresentationEvent;
 use ProfIT\Bbb\Events\UserEvent;
 use ProfIT\Bbb\Events\VoiceEvent;
 use ProfIT\Bbb\Events\WebcamEvent;
-use Running\Core\Collection;
-use Running\Fs\File;
+use Runn\Core\Collection;
+use Runn\Fs\File;
 
 /** @mixin Events */
 trait TEventsExtract

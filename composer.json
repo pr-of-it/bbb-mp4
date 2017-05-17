@@ -7,9 +7,9 @@
         }
     ],
     "require": {
-        "pr-of-it/running-core": "dev-master",
-        "pr-of-it/running-fs": "dev-master",
-        "pr-of-it/running-serialization": "dev-master"
+        "runn/core": "*",
+        "runn/fs": "*",
+        "runn/serialization": "*"
     },
     "autoload": {
         "psr-4" : {

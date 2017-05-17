@@ -3,8 +3,8 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
-use Running\Core\Collection;
-use Running\Core\Std;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 /**
  * Class TFunctions

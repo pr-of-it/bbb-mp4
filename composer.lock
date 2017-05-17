@@ -4,34 +4,32 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ba786598123c52d41fcc3645099a01c6",
-    "content-hash": "c708c26a499ed2836e143e1452f77905",
+    "content-hash": "af5cbdaa4ef256467914b7323ae67a28",
     "packages": [
         {
-            "name": "pr-of-it/running-core",
-            "version": "dev-master",
+            "name": "runn/core",
+            "version": "v7.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pr-of-it/running-core.git",
-                "reference": "9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0"
+                "url": "https://github.com/RunnMe/Core.git",
+                "reference": "fdda7e9ae95d089574b7522761eb5cf87c1ce806"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr-of-it/running-core/zipball/9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0",
-                "reference": "9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0",
+                "url": "https://api.github.com/repos/RunnMe/Core/zipball/fdda7e9ae95d089574b7522761eb5cf87c1ce806",
+                "reference": "fdda7e9ae95d089574b7522761eb5cf87c1ce806",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0"
+                "php": ">=7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "5.*",
-                "pr-of-it/running-fs": "*"
+                "phpunit/phpunit": "5.*"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Running\\": "src/"
+                    "Runn\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -45,37 +43,45 @@
                 {
                     "name": "Maxim Fedorov",
                     "email": "scorp7mix@gmail.com"
+                },
+                {
+                    "name": "Dmitriy Makarov",
+                    "email": "ru.damakarov@gmail.com"
+                },
+                {
+                    "name": "Dmitry Karasev",
+                    "email": "karasev.dmitry@gmail.com"
                 }
             ],
-            "description": "Running.FM Core Library",
+            "description": "Runn Me! Core Library",
             "keywords": [
                 "collection",
                 "framework",
                 "multiexception",
-                "running",
-                "running.fm",
+                "runn",
+                "runn.me",
                 "std"
             ],
-            "time": "2017-02-28 08:41:45"
+            "time": "2017-04-26T09:18:16+00:00"
         },
         {
-            "name": "pr-of-it/running-fs",
-            "version": "dev-master",
+            "name": "runn/fs",
+            "version": "v7.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pr-of-it/running-fs.git",
-                "reference": "c618b4a0c49172fefcc0126930cb89c614621bc8"
+                "url": "https://github.com/RunnMe/Fs.git",
+                "reference": "8eb5a0617fb41f85969928aa4fdb803153975a63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr-of-it/running-fs/zipball/c618b4a0c49172fefcc0126930cb89c614621bc8",
-                "reference": "c618b4a0c49172fefcc0126930cb89c614621bc8",
+                "url": "https://api.github.com/repos/RunnMe/Fs/zipball/8eb5a0617fb41f85969928aa4fdb803153975a63",
+                "reference": "8eb5a0617fb41f85969928aa4fdb803153975a63",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
-                "pr-of-it/running-core": "*",
-                "pr-of-it/running-serialization": "*"
+                "php": ">=7.1",
+                "runn/core": "7.1.*",
+                "runn/serialization": "7.1.*"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.*"
@@ -83,7 +89,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Running\\": "src/"
+                    "Runn\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -95,33 +101,33 @@
                     "name": "Albert Stepantsev"
                 }
             ],
-            "description": "Running.FM FileSystem Library",
+            "description": "Runn Me! File System Library",
             "keywords": [
                 "file",
                 "folder",
                 "framework",
-                "running",
-                "running.fm"
+                "runn",
+                "runn.me"
             ],
-            "time": "2017-02-28 10:06:11"
+            "time": "2017-04-18T12:54:50+00:00"
         },
         {
-            "name": "pr-of-it/running-serialization",
-            "version": "dev-master",
+            "name": "runn/serialization",
+            "version": "v7.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pr-of-it/running-serialization.git",
-                "reference": "ca8be538dddc1df0dca2c5c12f989b929a44b7cd"
+                "url": "https://github.com/RunnMe/Serialization.git",
+                "reference": "e726040225f83e0447914d4864f89d1b35843dfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr-of-it/running-serialization/zipball/ca8be538dddc1df0dca2c5c12f989b929a44b7cd",
-                "reference": "ca8be538dddc1df0dca2c5c12f989b929a44b7cd",
+                "url": "https://api.github.com/repos/RunnMe/Serialization/zipball/e726040225f83e0447914d4864f89d1b35843dfb",
+                "reference": "e726040225f83e0447914d4864f89d1b35843dfb",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
-                "pr-of-it/running-core": "*"
+                "php": ">=7.1",
+                "runn/core": "7.1.*"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.*"
@@ -129,7 +135,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Running\\": "src/"
+                    "Runn\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -141,29 +147,25 @@
                     "name": "Albert Stepantsev"
                 }
             ],
-            "description": "Running.FM Serialization Library",
+            "description": "Runn Me! Serialization Library",
             "keywords": [
                 "decode",
                 "deserialize",
                 "encode",
                 "framework",
-                "running",
-                "running.fm",
+                "runn",
+                "runn.me",
                 "serialization",
                 "serialize",
                 "unserialize"
             ],
-            "time": "2017-02-28 09:54:27"
+            "time": "2017-04-18T10:45:54+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "pr-of-it/running-core": 20,
-        "pr-of-it/running-fs": 20,
-        "pr-of-it/running-serialization": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

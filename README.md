@@ -3,9 +3,9 @@ BigBlueButton Record Process
 
 # Необходимые зависимости
 
-## \Running\Core
-## \Running\Fs
-## \Running\Serialization
+## \Runn\Core
+## \Runn\Fs
+## \Runn\Serialization
 
 # Конфигурационный файл
 Содержит следующую информацию:
@@ -30,7 +30,7 @@ BigBlueButton Record Process
 
 
 ## Конструктор
-В качестве аргумента получает объект \Running\Core\Config
+В качестве аргумента получает объект \Runn\Core\Config
 
     new \BBB\Process($config);
 

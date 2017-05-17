@@ -2,7 +2,7 @@
 
 namespace ProfIT\Bbb\Events;
 
-use Running\Core\Std;
+use Runn\Core\Std;
 
 /**
  * Class DeskshareEvent

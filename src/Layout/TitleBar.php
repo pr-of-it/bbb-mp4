@@ -2,7 +2,7 @@
 
 namespace ProfIT\Bbb\Layout;
 
-use Running\Core\Std;
+use Runn\Core\Std;
 
 class TitleBar
     extends Box

@@ -5,7 +5,7 @@ namespace ProfIT\Bbb;
 use ProfIT\Bbb\Layout\Layout;
 use ProfIT\Bbb\Layout\StyleSheet;
 use ProfIT\Bbb\SOX\Sound;
-use Running\Core\Config;
+use Runn\Core\Config;
 
 /**
  * Class Process
@@ -21,7 +21,7 @@ class Process
     use TImageFunctions;
     use TFilterFunctions;
 
-    /** @var \Running\Core\Config $config */
+    /** @var \Runn\Core\Config $config */
     protected $config;
     /** @var \ProfIT\Bbb\FFMpeg $ffmpeg */
     protected $ffmpeg;

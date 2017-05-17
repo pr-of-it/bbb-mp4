@@ -7,8 +7,8 @@ use ProfIT\Bbb\Events\DeskshareEvent;
 use ProfIT\Bbb\Events\PresentationEvent;
 use ProfIT\Bbb\Events\UserEvent;
 use ProfIT\Bbb\Events\WebcamEvent;
-use Running\Core\Collection;
-use Running\Core\Std;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 /**
  * Class TFilterFunctions

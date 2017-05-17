@@ -1,3 +1,5 @@
-.idea
-resources/recordings
-/vendor/
+#resources/recordings
+vendor/
+source/
+result/
+.idea/

@@ -4,8 +4,8 @@ namespace ProfIT\Bbb\Layout;
 
 use ProfIT\Bbb\Events\ChatEvent;
 use ProfIT\Bbb\Events;
-use Running\Core\Collection;
-use Running\Core\Std;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 class Layout
 {
