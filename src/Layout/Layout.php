@@ -5,12 +5,11 @@ namespace ProfIT\Bbb\Layout;
 use ProfIT\Bbb\Events\ChatEvent;
 use ProfIT\Bbb\Events;
 use Runn\Core\Collection;
+use Runn\Core\Config;
 use Runn\Core\Std;
 
 class Layout
 {
-    protected $data;
-
     /** @var StyleSheet */
     protected $styles;
 
@@ -27,23 +26,23 @@ class Layout
     protected $markedWindowsNames = [];
     /** @var string[] */
     protected $unfilledWindowsNames = [];
+    /** @var bool */
+    protected $useBackground;
+    /** @var  string */
+    protected $imgFormat;
+    /** @var  string */
+    protected $backgroundFile;
 
-    public function __construct(string $filename, string $name, StyleSheet $styles)
+    public function __construct(Config $layoutConfig)
     {
-        /** @var \SimpleXMLElement $xml */
-        $xml = @simplexml_load_file($filename);
-        if (false === $xml) {
-            throw new \Exception('Layout file can not be loaded: ' . $filename);
-        }
-
-        $data = @$xml->xpath('//layouts/layout[@name="bbb.layout.name.' . $name . '"]');
-
-        if (false === $data) {
-            throw new \Exception('Invalid layout');
-        }
-
-        $this->styles = $styles;
-        $this->data = $data[0];
+        $this->styles = new StyleSheet($layoutConfig->styles);
+        $this->useBackground = false;
+        $this->width = $layoutConfig->width;
+        $this->height = $layoutConfig->height;
+        $this->imgFormat = $layoutConfig->imgType;
+        $this->backgroundFile = realpath($layoutConfig->background);
+        $this->pad = 10;
+        $this->windows = $layoutConfig->windows;
     }
 
     /**
@@ -52,6 +51,7 @@ class Layout
      * @param int $width
      * @param int $height
      * @param int $pad
+     * @return $this
      */
     public function setDimensions(int $width, int $height, int $pad)
     {
@@ -60,35 +60,27 @@ class Layout
         $this->pad = $pad;
 
         $this->makeWindows();
+
+        return $this;
     }
 
     /**
      * Create inner windows.
-     * Based on self XML data.
+     * Based on config.
      */
     protected function makeWindows()
     {
         $windows = [];
 
-        foreach ($this->data->window as $window) {
-            /** @var \SimpleXMLElement $window */
-            $attributes = $window->attributes();
-            if (
-                empty($attributes->width)
-                ||
-                false === in_array((string)$attributes->name, array_keys(Window::TITLES))
-            ) {
-                continue;
-            }
-
+        foreach ($this->windows as $name => $window) {
             $windows[] = new Window($this->styles, new Std([
-                'name'   => (string)$attributes->name,
-                'x'      => (int) round(((float)$attributes->x) * $this->width),
-                'y'      => (int) round(((float)$attributes->y) * $this->height),
-                'w'      => (int) round(((float)$attributes->width) * $this->width),
-                'h'      => (int) round(((float)$attributes->height) * $this->height),
-                'hidden' => $attributes->hidden == true,
-                'pad'    => $this->pad,
+                'name' => $name,
+                'x' => $window->x,
+                'y' => $window->y,
+                'w' => $window->width,
+                'h' => $window->height,
+                'hidden' => $window->hidden ?? false,
+                'pad' => $this->pad,
             ]));
         }
 
@@ -103,13 +95,14 @@ class Layout
      *
      * @return Window
      */
-    protected function createWindowWithParams(array $params) {
+    protected function createWindowWithParams(array $params)
+    {
         return new Window($this->styles, new Std([
-            'x'      => (int) round(((float)$params['x']) * $this->width),
-            'y'      => (int) round(((float)$params['y']) * $this->height),
-            'w'      => (int) round(((float)$params['w']) * $this->width),
-            'h'      => (int) round(((float)$params['h']) * $this->height),
-            'pad'    => $this->pad,
+            'x' => $params['x'] * $this->width,
+            'y' => $params['y'] * $this->height,
+            'w' => $params['w'] * $this->width,
+            'h' => $params['h'] * $this->height,
+            'pad' => $this->pad,
         ]));
     }
 
@@ -117,12 +110,15 @@ class Layout
      * Add custom window, based on input params, to object's windows property.
      *
      * @param array $params
+     * @return $this
      */
     public function addCustomWindow(array $params)
     {
         $customWindow = $this->createWindowWithParams($params);
         $customWindow->name = $params['name'];
         $this->windows[] = $customWindow;
+
+        return $this;
     }
 
     /**
@@ -130,6 +126,7 @@ class Layout
      *
      * @param array $params
      * @param string[] $list
+     * @return $this
      */
     public function addListWindow(array $params, array $list)
     {
@@ -138,6 +135,8 @@ class Layout
             $listWindow->createUserListRow($text);
         }
         $this->windows[] = $listWindow;
+
+        return $this;
     }
 
     /**
@@ -146,6 +145,7 @@ class Layout
      * @param array $params
      * @param Collection|ChatEvent[] $messages
      * @param \ProfIT\Bbb\Events $events
+     * @return $this
      */
     public function addChatListWindow(array $params, Collection $messages, Events $events)
     {
@@ -157,6 +157,8 @@ class Layout
             $listWindow->createChatMessage($item->message);
         }
         $this->windows[] = $listWindow;
+
+        return $this;
     }
 
     /**
@@ -203,18 +205,26 @@ class Layout
      * Set names of marked windows for this layout.
      *
      * @param string[] $marked
+     * @return $this
      */
-    public function setMarkedWindows(array $marked) {
+    public function setMarkedWindows(array $marked)
+    {
         $this->markedWindowsNames = $marked;
+
+        return $this;
     }
 
     /**
      * Set names of unfilled windows for this layout.
      *
      * @param string[] $unfilled
+     * @return $this
      */
-    public function setUnfilledWindows(array $unfilled) {
+    public function setUnfilledWindows(array $unfilled)
+    {
         $this->unfilledWindowsNames = $unfilled;
+
+        return $this;
     }
 
     /**
@@ -224,17 +234,45 @@ class Layout
      * @param bool $fillContent
      * @param bool $drawTitle
      * @param bool $bgTransparent
+     * @return $this
+     * @throws \Exception
      */
     public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
-
-        if (true === $bgTransparent) {
-            $transparency = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
-            imagefill($canvas, 0, 0, $transparency);
-            imagesavealpha($canvas, true);
+        if ($this->useBackground) {
+            switch ($this->imgFormat) {
+                case 'JPEG':
+                    $background = imagecreatefromjpeg($this->backgroundFile);
+                    break;
+                case 'GIF':
+                    $background = imagecreatefromgif($this->backgroundFile);
+                    break;
+                case 'TIFF':
+                case 'BMP':
+                case 'BMP2':
+                case 'BMP3':
+                    $tmpFile = tempnam('./', '');
+                    unlink($tmpFile);
+                    exec('convert ' . $this->backgroundFile . ' ' . $tmpFile . '.png');
+                    $background = imagecreatefrompng($tmpFile . '.png');
+                    unlink($tmpFile . '.png');
+                    break;
+                case 'PNG':
+                    $background = imagecreatefrompng($this->backgroundFile);
+                    break;
+                default:
+                    throw new \Exception('Unsupported image format: ' . $this->imgFormat);
+            }
+            imagecopyresized($canvas, $background, 0, 0, 0, 0, $this->width, $this->height, imagesx($background), imagesy($background));
         } else {
-            imagefill($canvas, 0, 0, Box::color($canvas, $this->styles->rules['Application']['backgroundColor']));
+            if (true === $bgTransparent) {
+                $transparency = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+                imagefill($canvas, 0, 0, $transparency);
+                imagesavealpha($canvas, true);
+            } else {
+                imagefill($canvas, 0, 0, Box::color($canvas, $this->styles->rules['Application']['backgroundColor']));
+            }
         }
 
         foreach ($this->windows as $window) {
@@ -254,6 +292,19 @@ class Layout
         }
 
         imagepng($canvas, $dstFileName);
+
+        return $this;
     }
 
+    /**
+     * Enable using background image to generate png file
+     * @return $this
+     */
+    public function useBackground()
+    {
+        $this->useBackground = true;
+        $this->makeWindows();
+
+        return $this;
+    }
 }

@@ -3,6 +3,7 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
+use ProfIT\Bbb\Layout\StyleSheet;
 use Runn\Core\Collection;
 use Runn\Core\Std;
 
@@ -57,7 +58,7 @@ trait TImageFunctions
             mkdir(dirname($dst));
         }
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
+        $layout = new Layout($this->config->layout);
         $layout->setDimensions($coords->w, $coords->h, 0);
         $layout->addListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
         $layout->generatePng($dst, true, false);
@@ -76,7 +77,7 @@ trait TImageFunctions
             mkdir(dirname($dst));
         }
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
+        $layout = new Layout($this->config->layout);
         $layout->setDimensions($coords->w, $coords->h, 0);
         $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $messages, $this->events);
         $layout->generatePng($dst, true, false);
@@ -152,20 +153,21 @@ trait TImageFunctions
             mkdir(dirname($dst));
         }
 
-        $titleHeight = (int)$this->styles->rules['.videoViewStyleNoFocus']['headerHeight'];
-        $contentWidth = $this->width - 2 * $pad;
-        $contentHeight = $this->height - $titleHeight - 3 * $pad;
+        $titleHeight = (int)(new StyleSheet($this->config->layout->styles))
+            ->rules['.videoViewStyleNoFocus']['headerHeight'];
+        $contentWidth = $this->config->layout->width - 2 * $pad;
+        $contentHeight = $this->config->layout->height - $titleHeight - 3 * $pad;
 
         $video = $this->getVideoResizedDimensions($src, $contentWidth, $contentHeight);
 
         $params = new Std([
             'w'      => $video->w + 2 * $pad,
             'h'      => $video->h + $titleHeight + 3 * $pad,
-            'x'      => round(($this->width - ($video->w + 2 * $pad)) / 2),
-            'y'      => round(($this->height - ($video->h + $titleHeight + 3 * $pad)) / 2),
+            'x'      => round(($this->config->layout->width - ($video->w + 2 * $pad)) / 2),
+            'y'      => round(($this->config->layout->height - ($video->h + $titleHeight + 3 * $pad)) / 2),
         ]);
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
+        $layout = new Layout($this->config->layout);
         $layout->setDimensions($params->w, $params->h, $pad);
         $layout->addCustomWindow([
             'name' => 'Deskshare',
