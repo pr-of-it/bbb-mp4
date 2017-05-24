@@ -4,25 +4,22 @@ namespace ProfIT\Bbb\Layout;
 
 use Runn\Core\Std;
 
-class TextRow
-    extends Box
+class TextRow extends Box
 {
     const FONT_PATH = __DIR__ . '/../../resources/fonts/arial.ttf';
 
     const TEXT_LEFT_OFFSET = 5;
-    
+
     protected $text;
     protected $bold;
 
-    public function __construct(StyleSheet $styles, Std $props, string $text, string $color = null, bool $bold = false)
+    public function __construct(Std $props, string $text, string $color = null, bool $bold = false)
     {
-        parent::__construct($styles, $props);
+        parent::__construct($props);
 
-        $this->bgColor   = self::COLOR_WHITE;
-        $this->bdColor   = self::COLOR_WHITE;
-        $this->fontColor = $color ?? $this->styles->rules['.mdiWindowTitle']['color'];
-        $this->fontSize  = $this->styles->rules['.mdiWindowTitle']['fontSize'] * 0.75;
-        $this->h         = $this->styles->rules['.mdiWindowTitle']['fontSize'] * 1.5;
+//        $this->bgColor = self::COLOR_WHITE;
+//        $this->bdColor = self::COLOR_WHITE;
+        $this->h = $this->fontSize * 1.5;
 
         $this->text = $text;
         $this->bold = $bold;

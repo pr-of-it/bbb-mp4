@@ -10,9 +10,6 @@ use Runn\Core\Std;
 
 class Layout
 {
-    /** @var StyleSheet */
-    protected $styles;
-
     /** @var  int */
     protected $width;
     /** @var  int */
@@ -35,7 +32,6 @@ class Layout
 
     public function __construct(Config $layoutConfig)
     {
-        $this->styles = new StyleSheet($layoutConfig->styles);
         $this->useBackground = false;
         $this->width = $layoutConfig->width;
         $this->height = $layoutConfig->height;
@@ -73,7 +69,7 @@ class Layout
         $windows = [];
 
         foreach ($this->windows as $name => $window) {
-            $windows[] = new Window($this->styles, new Std([
+            $windows[] = new Window(new Std([
                 'name' => $name,
                 'x' => $window->x,
                 'y' => $window->y,
@@ -97,7 +93,7 @@ class Layout
      */
     protected function createWindowWithParams(array $params)
     {
-        return new Window($this->styles, new Std([
+        return new Window(new Std([
             'x' => $params['x'] * $this->width,
             'y' => $params['y'] * $this->height,
             'w' => $params['w'] * $this->width,
@@ -122,13 +118,13 @@ class Layout
     }
 
     /**
-     * Add window, containing list of texts, to object's windows property.
+     * Add window, containing list of users texts, to object's windows property.
      *
      * @param array $params
      * @param string[] $list
      * @return $this
      */
-    public function addListWindow(array $params, array $list)
+    public function addUsersListWindow(array $params, array $list)
     {
         $listWindow = $this->createWindowWithParams($params);
         foreach ($list as $text) {
@@ -231,13 +227,10 @@ class Layout
      * Generate image in PNG format for this layout.
      *
      * @param $dstFileName
-     * @param bool $fillContent
-     * @param bool $drawTitle
-     * @param bool $bgTransparent
      * @return $this
      * @throws \Exception
      */
-    public function generatePng($dstFileName, bool $fillContent, bool $drawTitle = true, bool $bgTransparent = false)
+    public function generatePng($dstFileName)
     {
         $canvas = imagecreatetruecolor($this->width, $this->height);
         if ($this->useBackground) {
@@ -266,26 +259,14 @@ class Layout
             }
             imagecopyresized($canvas, $background, 0, 0, 0, 0, $this->width, $this->height, imagesx($background), imagesy($background));
         } else {
-            if (true === $bgTransparent) {
                 $transparency = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
                 imagefill($canvas, 0, 0, $transparency);
                 imagesavealpha($canvas, true);
-            } else {
-                imagefill($canvas, 0, 0, Box::color($canvas, $this->styles->rules['Application']['backgroundColor']));
-            }
         }
 
         foreach ($this->windows as $window) {
             if (count($this->markedWindowsNames) > 0 && false === in_array($window->name, $this->markedWindowsNames)) {
                 continue;
-            }
-
-            if (true === $drawTitle) {
-                $window->createTitleBar();
-            }
-
-            if (true === $fillContent && false === in_array($window->name, $this->unfilledWindowsNames)) {
-                $window->fillContentBackground();
             }
 
             $window->render($canvas);

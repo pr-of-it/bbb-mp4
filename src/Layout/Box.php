@@ -43,19 +43,12 @@ class Box
     /** @var bool */
     public $hidden;
 
-    /** @var StyleSheet */
-    public $styles;
-
     /** default styles */
-    protected $bgColor   = self::COLOR_GRAY;
-    protected $bdColor   = self::COLOR_BLACK;
     protected $fontColor = self::COLOR_BLACK;
     protected $fontSize  = self::DEFAULT_FONT_SIZE;
 
-    public function __construct(StyleSheet $styles = null, Std $props = null)
+    public function __construct(Std $props = null)
     {
-        $this->styles = $styles;
-
         foreach ($props as $key => $val) {
             if (null !== $val) {
                 $this->$key = $val;
@@ -69,23 +62,9 @@ class Box
             return;
         }
 
-        $yCorrection = $this->parent->yCorrection ?? 0;
-        imagefilledrectangle(
-            $canvas,
-            $this->x,
-            $this->y + $yCorrection,
-            $this->x + $this->w - 1,
-            $this->y + $yCorrection + $this->h - 1,
-            self::color($canvas, $this->bgColor)
-        );
-        imagerectangle(
-            $canvas,
-            $this->x,
-            $this->y + $yCorrection,
-            $this->x + $this->w - 1,
-            $this->y + $yCorrection + $this->h - 1,
-            self::color($canvas, $this->bdColor)
-        );
+        $transparency = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagefill($canvas, 0, 0, $transparency);
+        imagesavealpha($canvas, true);
 
         foreach ($this->children as $child) {
             /** @var Box $child */

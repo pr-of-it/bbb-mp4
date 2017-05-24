@@ -3,7 +3,6 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
-use ProfIT\Bbb\Layout\StyleSheet;
 use Runn\Core\Collection;
 use Runn\Core\Std;
 
@@ -52,7 +51,7 @@ trait TImageFunctions
      * @param Std $coords
      * @param array $list
      */
-    protected function generateListImage(string $dst, Std $coords, array $list)
+    protected function generateUsersListImage(string $dst, Std $coords, array $list)
     {
         if (!file_exists(dirname($dst))) {
             mkdir(dirname($dst));
@@ -60,8 +59,8 @@ trait TImageFunctions
 
         $layout = new Layout($this->config->layout);
         $layout->setDimensions($coords->w, $coords->h, 0);
-        $layout->addListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
-        $layout->generatePng($dst, true, false);
+        $layout->addUsersListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
+        $layout->generatePng($dst);
     }
 
     /**
@@ -80,7 +79,7 @@ trait TImageFunctions
         $layout = new Layout($this->config->layout);
         $layout->setDimensions($coords->w, $coords->h, 0);
         $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $messages, $this->events);
-        $layout->generatePng($dst, true, false);
+        $layout->generatePng($dst);
     }
 
     /**
@@ -153,18 +152,16 @@ trait TImageFunctions
             mkdir(dirname($dst));
         }
 
-        $titleHeight = (int)(new StyleSheet($this->config->layout->styles))
-            ->rules['.videoViewStyleNoFocus']['headerHeight'];
         $contentWidth = $this->config->layout->width - 2 * $pad;
-        $contentHeight = $this->config->layout->height - $titleHeight - 3 * $pad;
+        $contentHeight = $this->config->layout->height - 2 * $pad;
 
         $video = $this->getVideoResizedDimensions($src, $contentWidth, $contentHeight);
 
         $params = new Std([
             'w'      => $video->w + 2 * $pad,
-            'h'      => $video->h + $titleHeight + 3 * $pad,
+            'h'      => $video->h + 2 * $pad,
             'x'      => round(($this->config->layout->width - ($video->w + 2 * $pad)) / 2),
-            'y'      => round(($this->config->layout->height - ($video->h + $titleHeight + 3 * $pad)) / 2),
+            'y'      => round(($this->config->layout->height - ($video->h + 2 * $pad)) / 2),
         ]);
 
         $layout = new Layout($this->config->layout);
@@ -177,7 +174,7 @@ trait TImageFunctions
             'h' => 1,
         ]);
         $layout->setMarkedWindows(['Deskshare']);
-        $layout->generatePng($dst, false, true);
+        $layout->generatePng($dst);
 
         $window = $layout->getWindowByName('Deskshare');
 

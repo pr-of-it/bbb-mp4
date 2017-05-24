@@ -59,7 +59,7 @@ class Process
         $this->layout
             ->useBackground()
             ->setUnfilledWindows(['PresentationWindow', 'VideoDock'])
-            ->generatePng($this->dst . $this->layoutImageName, true);
+            ->generatePng($this->dst . $this->layoutImageName);
 
         /** Prepare sound */
         $this->log('...preparing sound');
