@@ -45,7 +45,7 @@ class Box
 
     /** default styles */
     protected $fontColor = self::COLOR_BLACK;
-    protected $fontSize  = self::DEFAULT_FONT_SIZE;
+    public $fontSize  = self::DEFAULT_FONT_SIZE;
 
     public function __construct(Std $props = null)
     {

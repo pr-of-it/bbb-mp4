@@ -3,6 +3,7 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
+use ProfIT\Bbb\Layout\Window;
 use Runn\Core\Collection;
 use Runn\Core\Std;
 
@@ -48,18 +49,21 @@ trait TImageFunctions
      * Generate image based on coordinates and list of texts
      *
      * @param string $dst
-     * @param Std $coords
+     * @param Window $context
      * @param array $list
      */
-    protected function generateUsersListImage(string $dst, Std $coords, array $list)
+    protected function generateUsersListImage(string $dst, Window $context, array $list)
     {
         if (!file_exists(dirname($dst))) {
             mkdir(dirname($dst));
         }
 
         $layout = new Layout($this->config->layout);
-        $layout->setDimensions($coords->w, $coords->h, 0);
-        $layout->addUsersListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
+        $layout->setDimensions($context->w, $context->h, 0);
+        $layout->addUsersListWindow(
+            ['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'fontSize' => $context->fontSize],
+            $list
+        );
         $layout->generatePng($dst);
     }
 
@@ -67,18 +71,22 @@ trait TImageFunctions
      * Generate image based on coordinates and list of chat messages
      *
      * @param string $dst
-     * @param Std $coords
+     * @param Window $context
      * @param Collection $messages
      */
-    protected function generateChatListImage(string $dst, Std $coords, Collection $messages)
+    protected function generateChatListImage(string $dst, Window $context, Collection $messages)
     {
         if (!file_exists(dirname($dst))) {
             mkdir(dirname($dst));
         }
 
         $layout = new Layout($this->config->layout);
-        $layout->setDimensions($coords->w, $coords->h, 0);
-        $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $messages, $this->events);
+        $layout->setDimensions($context->w, $context->h, 0);
+        $layout->addChatListWindow(
+            ['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'fontSize' => $context->fontSize],
+            $messages,
+            $this->events
+        );
         $layout->generatePng($dst);
     }
 

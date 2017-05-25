@@ -37,7 +37,7 @@ class Layout
         $this->height = $layoutConfig->height;
         $this->imgFormat = $layoutConfig->imgType;
         $this->backgroundFile = realpath($layoutConfig->background);
-        $this->pad = 10;
+        $this->pad = 0;
         $this->windows = $layoutConfig->windows;
     }
 
@@ -77,6 +77,7 @@ class Layout
                 'h' => $window->height,
                 'hidden' => $window->hidden ?? false,
                 'pad' => $this->pad,
+                'fontSize' => $window->fontSize ?? Box::DEFAULT_FONT_SIZE,
             ]));
         }
 
@@ -99,6 +100,7 @@ class Layout
             'w' => $params['w'] * $this->width,
             'h' => $params['h'] * $this->height,
             'pad' => $this->pad,
+            'fontSize' => $params['fontSize'] ?? Box::DEFAULT_FONT_SIZE,
         ]));
     }
 

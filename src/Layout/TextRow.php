@@ -13,15 +13,15 @@ class TextRow extends Box
     protected $text;
     protected $bold;
 
-    public function __construct(Std $props, string $text, string $color = null, bool $bold = false)
+    public function __construct(Std $props, string $text, int $size = null, string $color = null, bool $bold = false)
     {
         parent::__construct($props);
 
-//        $this->bgColor = self::COLOR_WHITE;
-//        $this->bdColor = self::COLOR_WHITE;
+        $this->fontSize = $size;
         $this->h = $this->fontSize * 1.5;
 
         $this->text = $text;
+        $this->fontColor = $color ?? Box::COLOR_BLACK;
         $this->bold = $bold;
     }
 
@@ -30,34 +30,6 @@ class TextRow extends Box
         parent::render($canvas);
 
         self::renderText($canvas, $this->text, $this->bold);
-    }
-
-    public function cutTextToWidth()
-    {
-        $maxTextWidth = $this->w - 2 * $this->pad;
-
-        $bbox = imagettfbbox($this->fontSize, 0, static::FONT_PATH, $this->text);
-        $textWidth = $bbox[2] - $bbox[0];
-
-        if ($textWidth <= $maxTextWidth) {
-            return false;
-        }
-
-        $words = explode(' ', $this->text);
-
-        foreach (range(1, count($words)) as $numWordsToCut) {
-            $wordsCutted = array_slice($words, 0, count($words) - $numWordsToCut);
-            $textCutted = implode(' ', $wordsCutted);
-            $bbox = imagettfbbox($this->fontSize, 0, static::FONT_PATH, $textCutted);
-            $textWidth = $bbox[2] - $bbox[0];
-
-            if ($textWidth <= $maxTextWidth) {
-                $this->text = $textCutted;
-                return implode(' ', array_slice($words, count($words) - $numWordsToCut));
-            }
-        }
-
-        return false;
     }
 
     public function alignRight()

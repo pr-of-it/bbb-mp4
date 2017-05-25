@@ -43,7 +43,7 @@ trait TFilterFunctions
     protected function prepareUserFilters(Collection $events)
     {
         $users = [];
-        $content = $this->layout->getWindowByName('UsersWindow')->getContentCoordinates();
+        $context = $this->layout->getWindowByName('UsersWindow');
 
         foreach ($events as $key => $event) {
             if ('join' === $event->type) {
@@ -55,13 +55,13 @@ trait TFilterFunctions
             }
 
             $image = $this->dst . 'users/list.' . $event->time . '.png';
-            $this->generateUsersListImage($image, $content, $users);
+            $this->generateUsersListImage($image, $context, $users);
             $this->ffmpeg->addImageSource($image);
             $this->ffmpeg->addImageFilter(
                 ($event->time - $this->sound->getStartTime()) / 1000,
                 isset($events[$key + 1]) ? (($events[$key + 1]->time - $this->sound->getStartTime()) / 1000) : '100000',
-                $content->x,
-                $content->y
+                $context->x,
+                $context->y
             );
         }
     }
@@ -73,30 +73,30 @@ trait TFilterFunctions
     {
         $messages = new Collection();
 
-        $content = $this->layout->getWindowByName('ChatWindow')->getContentCoordinates();
+        $context = $this->layout->getWindowByName('ChatWindow');
 
         $dstPath = $this->dst . 'chat/';
         /** Chat caption from start */
         $image = $dstPath . 'list.' . $this->sound->getStartTime() . '.png';
-        $this->generateChatListImage($image, $content, $messages);
+        $this->generateChatListImage($image, $context, $messages);
         $this->ffmpeg->addImageSource($image);
         $this->ffmpeg->addImageFilter(
             0,
             isset($events[0]) ? (($events[0]->time - $this->sound->getStartTime()) / 1000) : '100000',
-            $content->x,
-            $content->y
+            $context->x,
+            $context->y
         );
 
         foreach ($events as $key => $event) {
             $messages->append($event);
             $image = $dstPath . 'list.' . $event->time . '.png';
-            $this->generateChatListImage($image, $content, $messages);
+            $this->generateChatListImage($image, $context, $messages);
             $this->ffmpeg->addImageSource($image);
             $this->ffmpeg->addImageFilter(
                 ($event->time - $this->sound->getStartTime()) / 1000,
                 isset($events[$key + 1]) ? (($events[$key + 1]->time - $this->sound->getStartTime()) / 1000) : '100000',
-                $content->x,
-                $content->y
+                $context->x,
+                $context->y
             );
         }
     }
