@@ -17,11 +17,11 @@ class TextRow extends Box
     {
         parent::__construct($props);
 
-        $this->fontSize = $size;
-        $this->h = $this->fontSize * 1.5;
+        $this->fontSize = $size ?? self::DEFAULT_FONT_SIZE;
+        $this->h = 2 * $size;
 
         $this->text = $text;
-        $this->fontColor = $color ?? Box::COLOR_BLACK;
+        $this->fontColor = $color ?? self::DEFAULT_FONT_COLOR;
         $this->bold = $bold;
     }
 

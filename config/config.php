@@ -43,14 +43,14 @@ return [
                 'y' => 42,
                 'width' => 231,
                 'height' => 318,
-                'fontSize' => 7,
+                'fontSize' => 6,
             ],
             'UsersWindow' => [
                 'x' => 2,
                 'y' => 38,
                 'width' => 138,
                 'height' => 211,
-                'fontSize' => 10,
+                'fontSize' => 6,
             ],
             'ViewersWindow' => [
                 'x' => 0,

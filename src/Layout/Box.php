@@ -11,10 +11,12 @@ use Runn\Core\Std;
 
 class Box
 {
-    const COLOR_BLACK       = '#000000';
-    const COLOR_GRAY        = '#CCCCCC';
-    const COLOR_WHITE       = '#FFFFFF';
-    const DEFAULT_FONT_SIZE = 12;
+    const COLOR_BLACK        = '#000000';
+    const COLOR_GRAY         = '#CCCCCC';
+    const COLOR_WHITE        = '#FFFFFF';
+    const FONT_PATH          = __DIR__ . '/../../resources/fonts/arial.ttf';
+    const DEFAULT_FONT_COLOR = '#3f3f41';
+    const DEFAULT_FONT_SIZE  = 9;
 
     /** @var int coordinates and sizes */
     public $x;
@@ -44,7 +46,7 @@ class Box
     public $hidden;
 
     /** default styles */
-    protected $fontColor = self::COLOR_BLACK;
+    protected $fontColor = self::DEFAULT_FONT_COLOR;
     public $fontSize  = self::DEFAULT_FONT_SIZE;
 
     public function __construct(Std $props = null)

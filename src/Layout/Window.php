@@ -6,6 +6,8 @@ use Runn\Core\Std;
 
 class Window extends Box
 {
+    const CHAT_MESSAGE_CAPTION_COLOR = '999999';
+
     public $name;
 
     public function getCoordinates()
@@ -138,13 +140,13 @@ class Window extends Box
         $textRow = $this->createTextRows(
             $user,
             TextRow::TEXT_LEFT_OFFSET,
-            self::COLOR_BLACK
+            self::CHAT_MESSAGE_CAPTION_COLOR
         );
         $this->offset['top'] -= array_pop($textRow)->h;
         $textRow = $this->createTextRows(
             $time,
             TextRow::TEXT_LEFT_OFFSET,
-            self::COLOR_BLACK
+            self::CHAT_MESSAGE_CAPTION_COLOR
         );
         array_pop($textRow)->alignRight();
     }
