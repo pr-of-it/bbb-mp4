@@ -2,7 +2,7 @@
 
 namespace ProfIT\Bbb\Layout;
 
-use ProfIT\Bbb\Layout;
+use Running\Core\Std;
 
 class TextRow
     extends Box
@@ -14,7 +14,7 @@ class TextRow
     protected $text;
     protected $bold;
 
-    public function __construct(StyleSheet $styles, array $props = [], string $text, string $color = null, bool $bold = false)
+    public function __construct(StyleSheet $styles, Std $props, string $text, string $color = null, bool $bold = false)
     {
         parent::__construct($styles, $props);
 
@@ -68,6 +68,6 @@ class TextRow
         $bbox = imagettfbbox($this->fontSize, 0, static::FONT_PATH, $this->text);
         $textWidth = $bbox[2] - $bbox[0];
 
-        $this->x = $this->x + $this->w - $this->pad - $textWidth;
+        $this->x = $this->x + $this->w - $this->pad - $textWidth - 5;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace ProfIT\Bbb\Layout;
 
+use Running\Core\Std;
+
 class Window
     extends Box
 {
@@ -15,7 +17,7 @@ class Window
         'Deskshare'          => 'Трансляция рабочего стола',
     ];
 
-    public function __construct(StyleSheet $styles, array $props = [])
+    public function __construct(StyleSheet $styles, Std $props = null)
     {
         parent::__construct($styles, $props);
 
@@ -25,7 +27,7 @@ class Window
 
     public function createTitleBar()
     {
-        $titleBar = new TitleBar($this->styles, array_merge($this->getContentCoordinates(), ['pad' => $this->pad]));
+        $titleBar = new TitleBar($this->styles, $this->getContentCoordinates()->merge(new Std(['pad' => $this->pad])));
 
         $this->addChild($titleBar);
         $this->addOffset('top', $titleBar->h + $this->pad);
@@ -40,25 +42,32 @@ class Window
 
     public function getCoordinates()
     {
-        return array_merge(
-            [$this->name],
-            [$this->x, $this->y, $this->w, $this->h],
-            array_values($this->getContentCoordinates())
-        );
+        $contentCoordinates = $this->getContentCoordinates();
+        $coordinates = new Std([
+            'x'  => $this->x,
+            'y'  => $this->y,
+            'w'  => $this->w,
+            'h'  => $this->h,
+            'cx' => $contentCoordinates->x,
+            'cy' => $contentCoordinates->y,
+            'cw' => $contentCoordinates->w,
+            'ch' => $contentCoordinates->h,
+        ]);
+        return $coordinates;
     }
 
     public function getContentCoordinates()
     {
-        return [
+        return new Std([
             'x' => $this->x + $this->pad + $this->offset['left'],
             'y' => $this->y + $this->pad + $this->offset['top'],
             'w' => $this->w - $this->pad * 2 - $this->offset['left'] - $this->offset['right'],
             'h' => $this->h - $this->pad * 2 - $this->offset['top'] - $this->offset['bottom'],
-        ];
+        ]);
     }
     
     public function createTextRow(string $text, $pad = 0, string $color = null, bool $bold = false) {
-        $textRow = new TextRow($this->styles, array_merge($this->getContentCoordinates(), ['pad' => $pad]), $text, $color, $bold);
+        $textRow = new TextRow($this->styles, $this->getContentCoordinates()->merge(new Std(['pad' => $pad])), $text, $color, $bold);
         $this->addChild($textRow);
         $textContentHeight = $textRow->h + $this->pad;
         $this->addOffset('top', $textContentHeight);

@@ -1,0 +1,171 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "ba786598123c52d41fcc3645099a01c6",
+    "content-hash": "c708c26a499ed2836e143e1452f77905",
+    "packages": [
+        {
+            "name": "pr-of-it/running-core",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pr-of-it/running-core.git",
+                "reference": "9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pr-of-it/running-core/zipball/9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0",
+                "reference": "9ae6dd1c2073ae42e5db03bf3b9c1e7a6a50f5d0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.*",
+                "pr-of-it/running-fs": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Running\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL v.3"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Stepantsev"
+                },
+                {
+                    "name": "Maxim Fedorov",
+                    "email": "scorp7mix@gmail.com"
+                }
+            ],
+            "description": "Running.FM Core Library",
+            "keywords": [
+                "collection",
+                "framework",
+                "multiexception",
+                "running",
+                "running.fm",
+                "std"
+            ],
+            "time": "2017-02-28 08:41:45"
+        },
+        {
+            "name": "pr-of-it/running-fs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pr-of-it/running-fs.git",
+                "reference": "c618b4a0c49172fefcc0126930cb89c614621bc8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pr-of-it/running-fs/zipball/c618b4a0c49172fefcc0126930cb89c614621bc8",
+                "reference": "c618b4a0c49172fefcc0126930cb89c614621bc8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "pr-of-it/running-core": "*",
+                "pr-of-it/running-serialization": "*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Running\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL v.3"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Stepantsev"
+                }
+            ],
+            "description": "Running.FM FileSystem Library",
+            "keywords": [
+                "file",
+                "folder",
+                "framework",
+                "running",
+                "running.fm"
+            ],
+            "time": "2017-02-28 10:06:11"
+        },
+        {
+            "name": "pr-of-it/running-serialization",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pr-of-it/running-serialization.git",
+                "reference": "ca8be538dddc1df0dca2c5c12f989b929a44b7cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pr-of-it/running-serialization/zipball/ca8be538dddc1df0dca2c5c12f989b929a44b7cd",
+                "reference": "ca8be538dddc1df0dca2c5c12f989b929a44b7cd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "pr-of-it/running-core": "*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Running\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL v.3"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Stepantsev"
+                }
+            ],
+            "description": "Running.FM Serialization Library",
+            "keywords": [
+                "decode",
+                "deserialize",
+                "encode",
+                "framework",
+                "running",
+                "running.fm",
+                "serialization",
+                "serialize",
+                "unserialize"
+            ],
+            "time": "2017-02-28 09:54:27"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "pr-of-it/running-core": 20,
+        "pr-of-it/running-fs": 20,
+        "pr-of-it/running-serialization": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
