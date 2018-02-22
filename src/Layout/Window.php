@@ -2,56 +2,21 @@
 
 namespace ProfIT\Bbb\Layout;
 
-use Running\Core\Std;
+use Runn\Core\Std;
 
-class Window
-    extends Box
+class Window extends Box
 {
+    const CHAT_MESSAGE_CAPTION_COLOR = '999999';
+
     public $name;
-
-    const TITLES = [
-        'PresentationWindow' => 'Презентация',
-        'VideoDock'          => 'Веб-камера',
-        'ChatWindow'         => 'Чат',
-        'UsersWindow'        => 'Пользователи',
-        'Deskshare'          => 'Трансляция рабочего стола',
-    ];
-
-    public function __construct(StyleSheet $styles, Std $props = null)
-    {
-        parent::__construct($styles, $props);
-
-        $this->bgColor = $this->styles->rules['.videoViewStyleNoFocus']['backgroundColor'];
-        $this->bdColor = $this->styles->rules['.videoViewStyleNoFocus']['borderColor'];
-    }
-
-    public function createTitleBar()
-    {
-        $titleBar = new TitleBar($this->styles, $this->getContentCoordinates()->merge(new Std(['pad' => $this->pad])));
-
-        $this->addChild($titleBar);
-        $this->addOffset('top', $titleBar->h + $this->pad);
-    }
-
-    public function fillContentBackground()
-    {
-        $content = new Content($this->styles, $this->getContentCoordinates());
-
-        $this->addChild($content);
-    }
 
     public function getCoordinates()
     {
-        $contentCoordinates = $this->getContentCoordinates();
         $coordinates = new Std([
-            'x'  => $this->x,
-            'y'  => $this->y,
-            'w'  => $this->w,
-            'h'  => $this->h,
-            'cx' => $contentCoordinates->x,
-            'cy' => $contentCoordinates->y,
-            'cw' => $contentCoordinates->w,
-            'ch' => $contentCoordinates->h,
+            'x' => $this->x,
+            'y' => $this->y,
+            'w' => $this->w,
+            'h' => $this->h,
         ]);
         return $coordinates;
     }
@@ -65,41 +30,129 @@ class Window
             'h' => $this->h - $this->pad * 2 - $this->offset['top'] - $this->offset['bottom'],
         ]);
     }
-    
-    public function createTextRow(string $text, $pad = 0, string $color = null, bool $bold = false) {
-        $textRow = new TextRow($this->styles, $this->getContentCoordinates()->merge(new Std(['pad' => $pad])), $text, $color, $bold);
-        $this->addChild($textRow);
-        $textContentHeight = $textRow->h + $this->pad;
-        $this->addOffset('top', $textContentHeight);
 
-        $textOverflow = $textRow->cutTextToWidth();
-        if (false !== $textOverflow) {
-            $this->createTextRow($textOverflow, $pad, $color, $bold);
+    public function createTextRows(string $text, $pad = 0, string $color = null, bool $bold = false)
+    {
+        $cutText = $this->cutTextToWidth($text);
+        $textContentHeight = 0;
+        $textRows = [];
+        foreach ($cutText as $row) {
+            $textRow = new TextRow(
+                $this->getContentCoordinates()->merge(new Std(['pad' => $pad])),
+                $row,
+                $this->fontSize,
+                $color,
+                $bold
+            );
+            $textRows[] = $textRow;
+            $this->addChild($textRow);
+            $textContentHeight = $textRow->h + $this->pad;
+            $this->addOffset('top', $textContentHeight);
         }
+
         if ($this->offset['top'] > $this->h) {
-            $this->yCorrection -= $textContentHeight;
-            $this->h += $textContentHeight;
+            $this->yCorrection -= $textContentHeight * count($textRows);
+            $this->h += $textContentHeight * count($textRows);
         }
-        return $textRow;
+        return $textRows;
     }
 
-    public function createUserListRow(string $userName) {
-        $this->createTextRow($userName, 2 * TextRow::TEXT_LEFT_OFFSET);
+    /**
+     * Cutting text to output window width
+     *
+     * @param $text
+     * @return string[]
+     */
+    public function cutTextToWidth($text)
+    {
+        $maxTextWidth = $this->w - 2 * $this->pad - TextRow::TEXT_LEFT_OFFSET;
+        $rows = [];
+
+        while ($this->stringWidth($text) > $maxTextWidth) {
+            $words = explode(' ', $text);
+            if ($this->stringWidth($words[0]) > $maxTextWidth) {
+                $longWord = array_shift($words);
+                $words = array_merge($this->cutWordToWidth($longWord, $maxTextWidth), $words);
+            }
+
+            foreach (range(0, count($words)) as $numWordsToCut) {
+                $textCutted = implode(' ', array_slice($words, 0, count($words) - $numWordsToCut));
+
+                if ($this->stringWidth($textCutted) <= $maxTextWidth) {
+                    $text = implode(' ', array_slice($words, count($words) - $numWordsToCut));
+                    $rows[] = $textCutted;
+                    break;
+                }
+            }
+        }
+
+        $rows[] = $text;
+        return $rows;
     }
 
-    public function createChatListCaption(string $meetingName) {
-        $this->createTextRow('Добро пожаловать в ' . $meetingName, TextRow::TEXT_LEFT_OFFSET, '#1672ba', true);
-        $this->createTextRow('');
+    /**
+     * @param $str
+     * @return int
+     */
+    protected function stringWidth($str)
+    {
+        $box = imagettfbbox($this->fontSize, 0, TextRow::FONT_PATH, $str);
+        return $box[2] - $box[0];
     }
 
-    public function createChatMessageCaption(string $user, string $time) {
-        $textRow = $this->createTextRow($user, TextRow::TEXT_LEFT_OFFSET, $this->styles->rules['.quickWindowLinkStyle']['selectionColor']);
-        $this->offset['top'] -= $textRow->h;
-        $textRow = $this->createTextRow($time, TextRow::TEXT_LEFT_OFFSET, $this->styles->rules['.quickWindowLinkStyle']['selectionColor']);
-        $textRow->alignRight();
+    /**
+     * @param string $word
+     * @param int $maxWidth
+     * @return string[]
+     */
+    protected function cutWordToWidth($word, $maxWidth)
+    {
+        $parts = [];
+        while ($this->stringWidth($word) > $maxWidth) {
+            $chars = str_split($word);
+            foreach (range(0, count($chars)) as $numCharsToCut) {
+                $wordCutted = implode('', array_slice($chars, 0, count($chars) - $numCharsToCut));
+
+                if ($this->stringWidth($wordCutted) <= $maxWidth) {
+                    $word = implode('', array_slice($chars, count($chars) - $numCharsToCut));
+                    $parts[] = $wordCutted;
+                    break;
+                }
+            }
+        }
+        $parts[] = $word;
+        return $parts;
     }
 
-    public function createChatMessage(string $text) {
-        $this->createTextRow($text, 2 * TextRow::TEXT_LEFT_OFFSET);
+    public function createUserListRow(string $userName)
+    {
+        $this->createTextRows($userName, 2 * TextRow::TEXT_LEFT_OFFSET);
+    }
+
+    public function createChatListCaption(string $meetingName)
+    {
+        $this->createTextRows('Добро пожаловать в ' . $meetingName, TextRow::TEXT_LEFT_OFFSET, '#1672ba', true);
+        $this->createTextRows('');
+    }
+
+    public function createChatMessageCaption(string $user, string $time)
+    {
+        $textRow = $this->createTextRows(
+            $user,
+            TextRow::TEXT_LEFT_OFFSET,
+            self::CHAT_MESSAGE_CAPTION_COLOR
+        );
+        $this->offset['top'] -= array_pop($textRow)->h;
+        $textRow = $this->createTextRows(
+            $time,
+            TextRow::TEXT_LEFT_OFFSET,
+            self::CHAT_MESSAGE_CAPTION_COLOR
+        );
+        array_pop($textRow)->alignRight();
+    }
+
+    public function createChatMessage(string $text)
+    {
+        $this->createTextRows($text, 2 * TextRow::TEXT_LEFT_OFFSET);
     }
 }

@@ -7,8 +7,8 @@ use ProfIT\Bbb\Events\DeskshareEvent;
 use ProfIT\Bbb\Events\PresentationEvent;
 use ProfIT\Bbb\Events\UserEvent;
 use ProfIT\Bbb\Events\WebcamEvent;
-use Running\Core\Collection;
-use Running\Core\Std;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 /**
  * Class TFilterFunctions
@@ -40,9 +40,10 @@ trait TFilterFunctions
     /**
      * @param Collection|UserEvent[] $events
      */
-    protected function prepareUserFilters(Collection $events) {
+    protected function prepareUserFilters(Collection $events)
+    {
         $users = [];
-        $content = $this->layout->getWindowByName('UsersWindow')->getContentCoordinates();
+        $context = $this->layout->getWindowByName('UsersWindow');
 
         foreach ($events as $key => $event) {
             if ('join' === $event->type) {
@@ -54,13 +55,13 @@ trait TFilterFunctions
             }
 
             $image = $this->dst . 'users/list.' . $event->time . '.png';
-            $this->generateListImage($image, $content, $users);
+            $this->generateUsersListImage($image, $context, $users);
             $this->ffmpeg->addImageSource($image);
             $this->ffmpeg->addImageFilter(
                 ($event->time - $this->sound->getStartTime()) / 1000,
                 isset($events[$key + 1]) ? (($events[$key + 1]->time - $this->sound->getStartTime()) / 1000) : '100000',
-                $content->x,
-                $content->y
+                $context->x,
+                $context->y
             );
         }
     }
@@ -68,33 +69,34 @@ trait TFilterFunctions
     /**
      * @param Collection|ChatEvent[] $events
      */
-    protected function prepareChatFilters(Collection $events) {
+    protected function prepareChatFilters(Collection $events)
+    {
         $messages = new Collection();
 
-        $content = $this->layout->getWindowByName('ChatWindow')->getContentCoordinates();
+        $context = $this->layout->getWindowByName('ChatWindow');
 
         $dstPath = $this->dst . 'chat/';
         /** Chat caption from start */
         $image = $dstPath . 'list.' . $this->sound->getStartTime() . '.png';
-        $this->generateChatListImage($image, $content, $messages);
+        $this->generateChatListImage($image, $context, $messages);
         $this->ffmpeg->addImageSource($image);
         $this->ffmpeg->addImageFilter(
             0,
             isset($events[0]) ? (($events[0]->time - $this->sound->getStartTime()) / 1000) : '100000',
-            $content->x,
-            $content->y
+            $context->x,
+            $context->y
         );
 
         foreach ($events as $key => $event) {
             $messages->append($event);
             $image = $dstPath . 'list.' . $event->time . '.png';
-            $this->generateChatListImage($image, $content, $messages);
+            $this->generateChatListImage($image, $context, $messages);
             $this->ffmpeg->addImageSource($image);
             $this->ffmpeg->addImageFilter(
                 ($event->time - $this->sound->getStartTime()) / 1000,
                 isset($events[$key + 1]) ? (($events[$key + 1]->time - $this->sound->getStartTime()) / 1000) : '100000',
-                $content->x,
-                $content->y
+                $context->x,
+                $context->y
             );
         }
     }
@@ -102,7 +104,8 @@ trait TFilterFunctions
     /**
      * @param Collection|WebcamEvent[] $events
      */
-    protected function prepareWebcamFilters(Collection $events) {
+    protected function prepareWebcamFilters(Collection $events)
+    {
         $meetingId = $this->events->findMeetingId();
         if (null === $meetingId) {
             $this->error('Meeting ID not found');
@@ -111,11 +114,11 @@ trait TFilterFunctions
         $content = $this->layout->getWindowByName('VideoDock')->getContentCoordinates();
 
         $fragments = [];
-        foreach($events as $event) {
+        foreach ($events as $event) {
             if ('start' === $event->type) {
                 $fragments[$event->file] = new Std([
-                    'start'  => ($event->time - $this->sound->getStartTime()) / 1000,
-                    'end'    => '100000',
+                    'start' => ($event->time - $this->sound->getStartTime()) / 1000,
+                    'end' => '100000',
                     'source' => $this->src . 'video/' . $meetingId . '/' . $event->file . '.flv',
                 ]);
             } elseif ('stop' === $event->type) {
@@ -123,7 +126,7 @@ trait TFilterFunctions
             }
         }
 
-        foreach($fragments as $key => $video) {
+        foreach ($fragments as $key => $video) {
             $this->ffmpeg->addVideoSource($video);
 
             $source = $this->getVideoResizedDimensions($video->source, $content->w, $content->h);
@@ -145,13 +148,13 @@ trait TFilterFunctions
         $eventsCount = 0;
 
         $fragments = [];
-        foreach($events as $event) {
+        foreach ($events as $event) {
             /** @var DeskshareEvent $event */
             if ('started' === $event->type) {
                 $eventsCount++;
                 $fragments[$eventsCount] = new Std([
-                    'start'  => ($event->time - $this->sound->getStartTime()) / 1000,
-                    'end'    => '100000',
+                    'start' => ($event->time - $this->sound->getStartTime()) / 1000,
+                    'end' => '100000',
                     'source' => $this->src . 'deskshare/' . basename($event->file),
                 ]);
             } elseif ('stopped' === $event->type) {
@@ -159,7 +162,7 @@ trait TFilterFunctions
             }
         }
 
-        foreach($fragments as $key => $video) {
+        foreach ($fragments as $key => $video) {
             $image = $this->dst . 'deskshare/deskshare-' . $key . '.png';
             list($coords, $resized) = $this->makeDeskshareLayout($video->source, $image, 10);
 
@@ -169,10 +172,10 @@ trait TFilterFunctions
             $this->ffmpeg->addVideoSource($video);
 
             $this->ffmpeg->addVideoFilter($video, new Std([
-                'w' => $coords->cw,
-                'h' => $resized ? $coords->ch : '-1',
-                'x' => $coords->cx,
-                'y' => $coords->cy,
+                'w' => $coords->w,
+                'h' => $resized ? $coords->h : '-1',
+                'x' => $coords->x,
+                'y' => $coords->y,
             ]));
         }
     }

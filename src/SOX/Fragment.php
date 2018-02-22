@@ -2,7 +2,7 @@
 
 namespace ProfIT\Bbb\SOX;
 
-use Running\Core\Std;
+use Runn\Core\Std;
 
 /**
  * Class Fragment

@@ -3,8 +3,8 @@
 namespace ProfIT\Bbb\SOX;
 
 use ProfIT\Bbb\Events\VoiceEvent;
-use Running\Core\Collection;
-use Running\Core\Std;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 /**
  * Class Sound

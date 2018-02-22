@@ -3,8 +3,9 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
-use Running\Core\Collection;
-use Running\Core\Std;
+use ProfIT\Bbb\Layout\Window;
+use Runn\Core\Collection;
+use Runn\Core\Std;
 
 /**
  * Class TFunctions
@@ -48,38 +49,45 @@ trait TImageFunctions
      * Generate image based on coordinates and list of texts
      *
      * @param string $dst
-     * @param Std $coords
+     * @param Window $context
      * @param array $list
      */
-    protected function generateListImage(string $dst, Std $coords, array $list)
+    protected function generateUsersListImage(string $dst, Window $context, array $list)
     {
         if (!file_exists(dirname($dst))) {
             mkdir(dirname($dst));
         }
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
-        $layout->setDimensions($coords->w, $coords->h, 0);
-        $layout->addListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $list);
-        $layout->generatePng($dst, true, false);
+        $layout = new Layout($this->config->layout);
+        $layout->setDimensions($context->w, $context->h, 0);
+        $layout->addUsersListWindow(
+            ['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'fontSize' => $context->fontSize],
+            $list
+        );
+        $layout->generatePng($dst);
     }
 
     /**
      * Generate image based on coordinates and list of chat messages
      *
      * @param string $dst
-     * @param Std $coords
+     * @param Window $context
      * @param Collection $messages
      */
-    protected function generateChatListImage(string $dst, Std $coords, Collection $messages)
+    protected function generateChatListImage(string $dst, Window $context, Collection $messages)
     {
         if (!file_exists(dirname($dst))) {
             mkdir(dirname($dst));
         }
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
-        $layout->setDimensions($coords->w, $coords->h, 0);
-        $layout->addChatListWindow(['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1], $messages, $this->events);
-        $layout->generatePng($dst, true, false);
+        $layout = new Layout($this->config->layout);
+        $layout->setDimensions($context->w, $context->h, 0);
+        $layout->addChatListWindow(
+            ['x' => 0, 'y' => 0, 'w' => 1, 'h' => 1, 'fontSize' => $context->fontSize],
+            $messages,
+            $this->events
+        );
+        $layout->generatePng($dst);
     }
 
     /**
@@ -152,20 +160,19 @@ trait TImageFunctions
             mkdir(dirname($dst));
         }
 
-        $titleHeight = (int)$this->styles->rules['.videoViewStyleNoFocus']['headerHeight'];
-        $contentWidth = $this->width - 2 * $pad;
-        $contentHeight = $this->height - $titleHeight - 3 * $pad;
+        $contentWidth = $this->config->layout->width - 2 * $pad;
+        $contentHeight = $this->config->layout->height - 2 * $pad;
 
         $video = $this->getVideoResizedDimensions($src, $contentWidth, $contentHeight);
 
         $params = new Std([
             'w'      => $video->w + 2 * $pad,
-            'h'      => $video->h + $titleHeight + 3 * $pad,
-            'x'      => round(($this->width - ($video->w + 2 * $pad)) / 2),
-            'y'      => round(($this->height - ($video->h + $titleHeight + 3 * $pad)) / 2),
+            'h'      => $video->h + 2 * $pad,
+            'x'      => round(($this->config->layout->width - ($video->w + 2 * $pad)) / 2),
+            'y'      => round(($this->config->layout->height - ($video->h + 2 * $pad)) / 2),
         ]);
 
-        $layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
+        $layout = new Layout($this->config->layout);
         $layout->setDimensions($params->w, $params->h, $pad);
         $layout->addCustomWindow([
             'name' => 'Deskshare',
@@ -175,7 +182,7 @@ trait TImageFunctions
             'h' => 1,
         ]);
         $layout->setMarkedWindows(['Deskshare']);
-        $layout->generatePng($dst, false, true);
+        $layout->generatePng($dst);
 
         $window = $layout->getWindowByName('Deskshare');
 

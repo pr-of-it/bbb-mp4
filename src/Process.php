@@ -3,9 +3,8 @@
 namespace ProfIT\Bbb;
 
 use ProfIT\Bbb\Layout\Layout;
-use ProfIT\Bbb\Layout\StyleSheet;
 use ProfIT\Bbb\SOX\Sound;
-use Running\Core\Config;
+use Runn\Core\Config;
 
 /**
  * Class Process
@@ -13,23 +12,18 @@ use Running\Core\Config;
  *
  * @property string $src
  * @property string $dst
- * @property int $width
- * @property int $height
  */
 class Process
 {
     use TImageFunctions;
     use TFilterFunctions;
 
-    /** @var \Running\Core\Config $config */
+    /** @var \Runn\Core\Config $config */
     protected $config;
     /** @var \ProfIT\Bbb\FFMpeg $ffmpeg */
     protected $ffmpeg;
     /** @var \ProfIT\Bbb\Events $events */
     protected $events;
-    /** @var \ProfIT\Bbb\Layout\StyleSheet $styles */
-    protected $styles;
-
     /** @var \ProfIT\Bbb\Layout\Layout $layout */
     protected $layout;
     protected $layoutImageName = 'layout.png';
@@ -44,16 +38,10 @@ class Process
     public function __construct(Config $config)
     {
         $this->config = $config;
+        $this->checkConfig();
         $this->ffmpeg = new FFMpeg();
 
-        $this->src = realpath($config->paths->source);
-        if (!is_readable($this->src)) {
-            $this->error('Source directory does not exist or is not readable');
-        }
-        $this->src .= '/';
-
-        $this->width = $config->video->width ?? 1280;
-        $this->height = $config->video->height ?? 720;
+        $this->src = realpath($config->paths->source) . '/';
 
         if (!is_readable($config->paths->destination)) {
             mkdir($config->paths->destination, 0777);
@@ -61,17 +49,17 @@ class Process
         $this->dst = realpath($config->paths->destination) . '/';
 
         $this->events = new Events($this->src . 'events.xml');
-        $this->styles = new StyleSheet($config->paths->resources . '/style/css/BBBDefault.css');
     }
 
     public function run()
     {
         /** Prepare layout */
         $this->log('...preparing layout');
-        $this->layout = new Layout($this->config->paths->resources . '/layout.xml', 'defaultlayout', $this->styles);
-        $this->layout->setDimensions($this->width, $this->height, 10);
-        $this->layout->setUnfilledWindows(['PresentationWindow', 'VideoDock']);
-        $this->layout->generatePng($this->dst . $this->layoutImageName, true);
+        $this->layout = new Layout($this->config->layout);
+        $this->layout
+            ->useBackground()
+            ->setUnfilledWindows(['PresentationWindow', 'VideoDock'])
+            ->generatePng($this->dst . $this->layoutImageName);
 
         /** Prepare sound */
         $this->log('...preparing sound');
@@ -129,6 +117,50 @@ class Process
             exit(1);
         } else {
             throw new \Exception($message);
+        }
+    }
+
+    protected function checkConfig()
+    {
+        if (!is_readable(realpath($this->config->paths->resources))) {
+            $this->error('Resources directory does not exist or is not readable');
+        }
+
+        if (!is_readable(realpath($this->config->paths->source))) {
+            $this->error('Source directory does not exist or is not readable');
+        }
+
+        if (!is_readable($this->config->layout->styles)) {
+            $this->error('Layout styles file can not be loaded: ' . $this->config->layout->styles);
+        }
+
+        if (!is_readable($this->config->layout->background)) {
+            $this->error('Layout background file can not be loaded: ' . $this->config->layout->background);
+        }
+
+        $output = [];
+        $return_val = null;
+        $imgData = exec(
+            'magick identify -format "%m;%W;%H" ' . realpath($this->config->layout->background),
+            $output,
+            $return_val
+        );
+        if (0 == $return_val) {
+            [$this->config->layout->imgType, $width, $height] = explode(';', $imgData);
+            $this->config->layout->width = $this->config->layout->width ?? $width;
+            $this->config->layout->height = $this->config->layout->height ?? $height;
+        } else {
+            $this->error('Unknown background image format of file: ' . $this->config->layout->background);
+        }
+
+        $xs = [];
+        $ys = [];
+        foreach ($this->config->layout->windows as $window) {
+            $xs[] = $window->x + $window->width;
+            $ys[] = $window->y + $window->height;
+        }
+        if ($this->config->layout->width < max($xs) || $this->config->layout->height < max($ys)) {
+            $this->error('The windows should be located within the background');
         }
     }
 }

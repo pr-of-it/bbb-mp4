@@ -1,0 +1,7 @@
+Для работы приложения в системе должны быть установлены и прописаны в PATH:
+1. Аудиоредактор SoX (http://sox.sourceforge.net/)
+2. FFmpeg (https://ffmpeg.org/download.html)
+3. ImageMagick (https://www.imagemagick.org/script/download.php) Внимание! из данного пакета используется утилита convert. Ее имя совпадает с нативной утилитой из Windows, предназначенной для конвертации типа файловой системы. При этом в логах появляется сообщение "Invalid Parameter - 150"
+4. Ghostscript (https://www.ghostscript.com/download/gsdnld.html)
+
+Пока это не консольное приложение, а только основной класс для его реализации
